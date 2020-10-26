@@ -1,0 +1,9 @@
+name: DeathSwap
+main: com.blank038.deathswap.DeathSwap
+authors:
+  - Blank038
+  - DeathSwap
+version: 1.0.0-SNAPSHOT
+commands:
+  ds:
+    description: Command for DeathSwap.
