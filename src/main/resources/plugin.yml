@@ -5,5 +5,7 @@ authors:
   - DeathSwap
 version: 1.0.0-SNAPSHOT
 commands:
-  ds:
+  deathswap:
+    aliases:
+      - ds
     description: Command for DeathSwap.
