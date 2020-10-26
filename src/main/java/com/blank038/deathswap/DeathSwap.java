@@ -1,6 +1,8 @@
 package com.blank038.deathswap;
 
 import com.blank038.deathswap.command.MainCommand;
+import com.blank038.deathswap.listener.PlayerListener;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DeathSwap extends JavaPlugin {
@@ -15,6 +17,7 @@ public class DeathSwap extends JavaPlugin {
         inst = this;
         // 载入配置文件
         loadConfig();
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         getCommand("deathswap").setExecutor(new MainCommand());
     }
 

@@ -1,5 +1,6 @@
 package com.blank038.deathswap.listener;
 
+import com.blank038.deathswap.DeathSwap;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -11,6 +12,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class PlayerListener implements Listener {
+    private final DeathSwap INSTANCE;
+
+    public PlayerListener() {
+        INSTANCE = DeathSwap.getInstance();
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
