@@ -7,13 +7,13 @@ import org.bukkit.command.CommandSender;
 
 public class MainCommand implements CommandExecutor {
     private final DeathSwap INSTANCE;
-
+    private DeathSwap instance;
     public MainCommand() {
         INSTANCE = DeathSwap.getInstance();
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+    public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
         return false;
     }

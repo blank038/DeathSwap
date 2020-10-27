@@ -28,6 +28,7 @@ public class DeathSwap extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+
         inst = this;
         // load config.
         loadConfig();
@@ -41,7 +42,6 @@ public class DeathSwap extends JavaPlugin {
      * Configuration file initialize and reload.
      */
     public void loadConfig() {
-        getDataFolder().mkdir();
         saveDefaultConfig();
         reloadConfig();
         // variable langData initialize.

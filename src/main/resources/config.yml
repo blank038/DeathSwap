@@ -5,8 +5,8 @@ game-option:
 # 语言设置
 lang: zh_CN
 
-inGame:
+in-Game:
   # 游戏开始以后不允许进入服务器
-  joinServer: true
+  join-server: true
   # 踢出没有加入游戏的玩家
-  kickNotJoinGame: true
+  kick-not-join-game: true
