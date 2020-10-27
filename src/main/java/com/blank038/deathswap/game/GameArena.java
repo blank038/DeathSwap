@@ -10,9 +10,10 @@ import java.io.File;
 import java.util.HashMap;
 
 public class GameArena {
-    private final int min, max, size;
     private final HashMap<String, PlayerTempData> playerMap = new HashMap<>();
-    private String world, arenaName;
+    private final String world;
+    private String arenaName;
+    private int min, max, size;
 
     public GameArena(File file) {
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -41,14 +42,56 @@ public class GameArena {
         arenaName = ChatColor.translateAlternateColorCodes('&', name);
     }
 
+    public int getMin() {
+        return min;
+    }
+
+    public void setMin(int min) {
+        this.min = min;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
+    public void setMax(int max) {
+        this.max = max;
+    }
+
+    public String getGameWorld() {
+        return world;
+    }
+
+    public int getWorldBorderSize() {
+        return size;
+    }
+
+    public void setWorldBorderSize(int size) {
+        this.size = size;
+    }
+
+    /**
+     * Player try to join this arena.
+     */
     public void join(Player player) {
 
     }
 
+    /**
+     * On player quit arena or quit server.
+     *
+     * @param player Target player.
+     * @param force  Is force quit?
+     */
     public void quit(Player player, boolean force) {
 
     }
 
+    /**
+     * Player died trigger.
+     *
+     * @param player Target player.
+     */
     public void onDeath(Player player) {
 
     }

@@ -1,0 +1,34 @@
+# 提示文本
+message:
+  prefix: "&b死亡旋转 &f"
+  help:
+    defafult:
+      - ""
+      - " &d&l死亡旋转"
+      - "   &a/%c &fjoin <竞技场> &7加入指定竞技场"
+      - "   &a/%c &fquit &7离开当前竞技场"
+      - "   &a/%c &finfo &7查询我的游戏信息"
+      - ""
+    admin:
+      - ""
+      - " &d&l死亡旋转"
+      - "   &a/%c &fcreate <竞技场> <世界名> &7创建竞技场"
+      - "   &a/%c &fedtior &7查看竞技场编辑命令"
+      - "   &a/%c &fjoin <竞技场> &7加入指定竞技场"
+      - "   &a/%c &fquit &7离开当前竞技场"
+      - "   &a/%c &finfo &7查询我的游戏信息"
+      - ""
+    editor:
+      - ""
+      - " &d&l死亡旋转"
+      - "   &a/%c &feditor min <竞技场> <人数> &7设置最少人数"
+      - "   &a/%c &feditor max <竞技场> <人数> &7设置人数上限"
+      - "   &a/%c &fedtior name <竞技场> <名称> &7设置展示名"
+      - "   &a/%c &feditor wbiv <竞技场> <时间(s)> &7设置缩圈间隔"
+      - "   &a/%c &feditor tiv <竞技场> <时间(s)> &7设置传送间隔"
+      - "   &a/%c &feditor size <竞技场> <大小> &7设置竞技场初始边界大小"
+      - "   &a/%c &feditor wait <竞技场> &7设置竞技场等待点"
+      - "   &a/%c &feditor end <竞技场> &7设置竞技场结束点"
+      - "   &a/%c &feditor type <竞技场> <类型> &7设置中心坐标类型"
+      - ""
+  reload: "插件配置重载完成."
