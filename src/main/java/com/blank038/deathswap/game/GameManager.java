@@ -29,11 +29,13 @@ public class GameManager {
         if (arenaMap.get(arenaKey).join(player)) playerMap.put(player.getUniqueId(), arenaKey);
     }
 
-    public void submitQuit(Player player, boolean force) {
-        if (playerMap.containsKey(player.getUniqueId()))
-            arenaMap.get(playerMap.get(player.getUniqueId())).quit(player, force);
-        else
+    public void submitQuit(Player player) {
+        if (playerMap.containsKey(player.getUniqueId())) {
+            if (arenaMap.get(playerMap.get(player.getUniqueId())).quit(player))
+                playerMap.remove(player.getUniqueId());
+        } else {
             player.sendMessage(DeathSwap.getLangData().getString("message.not-in-arena", true));
+        }
     }
 
     public void start() {
@@ -44,5 +46,13 @@ public class GameManager {
 
     public GameArena getArena(String arenaName) {
         return arenaMap.get(arenaName);
+    }
+
+    public boolean hasArena(String key) {
+        return arenaMap.containsKey(key);
+    }
+
+    public boolean hasPlayer(UUID uuid) {
+        return playerMap.containsKey(uuid);
     }
 }

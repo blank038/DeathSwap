@@ -6,16 +6,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 
 public class PlayerListener implements Listener {
     private final DeathSwap INSTANCE;
 
     public PlayerListener() {
         INSTANCE = DeathSwap.getInstance();
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+        if (INSTANCE.getGameManager().hasPlayer(event.getPlayer().getUniqueId())) {
+
+        }
     }
 
     @EventHandler

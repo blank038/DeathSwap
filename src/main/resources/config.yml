@@ -1,12 +1,6 @@
 # 游戏模式设置
 game-option:
   bungee: false
-  server: "lobby"
+  lobby: "lobby"
 # 语言设置
 lang: zh_CN
-
-in-Game:
-  # 游戏开始以后不允许进入服务器
-  join-server: true
-  # 踢出没有加入游戏的玩家
-  kick-not-join-game: true

@@ -1,5 +1,6 @@
 package com.blank038.deathswap;
 
+import com.blank038.deathswap.api.DeathSwapApi;
 import com.blank038.deathswap.command.MainCommand;
 import com.blank038.deathswap.configuration.LangData;
 import com.blank038.deathswap.game.GameManager;
@@ -16,7 +17,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class DeathSwap extends JavaPlugin {
     private static DeathSwap inst;
     private static LangData langData;
-    public GameManager gameManager;
+    private GameManager gameManager;
+    private DeathSwapApi api;
+
     public static DeathSwap getInstance() {
         return inst;
     }
@@ -25,12 +28,21 @@ public class DeathSwap extends JavaPlugin {
         return langData;
     }
 
+    public GameManager getGameManager() {
+        return gameManager;
+    }
+
+    public DeathSwapApi getApi() {
+        return api;
+    }
+
     /**
      * 初始化插件
      */
     @Override
     public void onEnable() {
         inst = this;
+        api = new DeathSwapApi();
         // 载入配置文件
         loadConfig();
         // 注册事件监听器

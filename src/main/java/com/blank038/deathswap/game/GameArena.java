@@ -32,23 +32,16 @@ public class GameArena {
         max = data.getInt("max");
         world = data.getString("world");
         size = data.getInt("size");
+        tempSize = size;
         arenaName = ChatColor.translateAlternateColorCodes('&',
                 data.getString("display-name"));
 
+        if (data.contains("loc-type")) {
+            gameLocType = GameLocType.valueOf(data.getString("loc-type"));
+        }
         loadLoc(data);
 
-        if (waitLoc != null && endLoc != null && gameLocType != null && min >= 2) {
-            init();
-        }
-    }
-
-    public GameArena(String world, String arenaName) {
-        this.world = world;
-        min = 2;
-        max = 8;
-        size = 100;
-        this.arenaName = ChatColor.translateAlternateColorCodes('&', arenaName);
-        if (waitLoc != null && endLoc != null && gameLocType != null && min >= 2) {
+        if (world != null && waitLoc != null && endLoc != null && gameLocType != null && min >= 2) {
             init();
         }
     }
@@ -57,8 +50,44 @@ public class GameArena {
 
     }
 
+    /**
+     * 载入坐标数据
+     *
+     * @param data 目标配置文件
+     */
     public void loadLoc(FileConfiguration data) {
-
+        if (data.contains("end-pos")) {
+            String endWorld = data.getString("end-pos.world");
+            double x = data.getDouble("end-pos.x");
+            double y = data.getDouble("end-pos.y");
+            double z = data.getDouble("end-pos.z");
+            float yaw = (float) data.getDouble("end-pos.yaw");
+            float pitch = (float) data.getDouble("end-pos.pitch");
+            if (endWorld == null) {
+                return;
+            }
+            World world = Bukkit.getWorld(endWorld);
+            if (world == null) {
+                return;
+            }
+            endLoc = new Location(world, x, y, z, yaw, pitch);
+        }
+        if (data.contains("wait-pos")) {
+            String startWorld = data.getString("wait-pos.world");
+            double x = data.getDouble("wait-pos.x");
+            double y = data.getDouble("wait-pos.y");
+            double z = data.getDouble("wait-pos.z");
+            float yaw = (float) data.getDouble("wait-pos.yaw");
+            float pitch = (float) data.getDouble("wait-pos.pitch");
+            if (startWorld == null) {
+                return;
+            }
+            World world = Bukkit.getWorld(startWorld);
+            if (world == null) {
+                return;
+            }
+            waitLoc = new Location(world, x, y, z, yaw, pitch);
+        }
     }
 
     public String getArenaName() {
@@ -136,10 +165,15 @@ public class GameArena {
      * 玩家退出竞技场或离开服务器
      *
      * @param player 目标玩家
-     * @param force  是否为强制退出
      */
-    public void quit(Player player, boolean force) {
-
+    public boolean quit(Player player) {
+        if (playerMap.containsKey(player.getUniqueId())) {
+            // 恢复玩家背包
+            playerMap.get(player.getUniqueId()).restore();
+            TeleportManager.teleportEndLocation(player, endLoc);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -149,6 +183,16 @@ public class GameArena {
      */
     public void onDeath(Player player) {
 
+    }
+
+    /**
+     * 给房间内全体玩家发送文本
+     */
+    public void sendAllPlayerText(String text) {
+        for (Map.Entry<UUID, PlayerTempData> entry : playerMap.entrySet()) {
+            Player player = Bukkit.getPlayer(entry.getKey());
+            player.sendMessage(text);
+        }
     }
 
     /**
@@ -183,11 +227,10 @@ public class GameArena {
     public Location randomLocation(int radius) {
         World world = Bukkit.getWorld(this.world);
         Location spawnLocation = world.getWorldBorder().getCenter();
-        int minX = spawnLocation.getBlockX() - size, maxX = spawnLocation.getBlockX() + size;
-        int minZ = spawnLocation.getBlockZ() - size, maxZ = spawnLocation.getBlockZ() + size;
+        int minX = spawnLocation.getBlockX() - radius, maxX = spawnLocation.getBlockX() + radius;
+        int minZ = spawnLocation.getBlockZ() - radius, maxZ = spawnLocation.getBlockZ() + radius;
         int randomX = (int) (minX + Math.random() * (maxX - minX));
         int randomZ = (int) (minZ + Math.random() * (maxZ - minZ));
         return new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 1, randomZ);
     }
-
 }
