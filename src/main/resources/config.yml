@@ -4,3 +4,6 @@ game-option:
   lobby: "lobby"
 # 语言设置
 lang: zh_CN
+# 竞技场设置
+arena-option:
+  wait-time: 10

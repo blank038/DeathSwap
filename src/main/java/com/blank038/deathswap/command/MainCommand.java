@@ -35,7 +35,6 @@ public class MainCommand implements CommandExecutor {
                         }
                         return true;
                     case "max":
-
                         if (!CoreUtil.isInteger(arg_4)) {
                             sender.sendMessage(DeathSwap.getLangData().getString("format-error-int", true));
                         } else {

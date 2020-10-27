@@ -9,21 +9,25 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class GameArena {
     private final HashMap<UUID, PlayerTempData> playerMap = new HashMap<>();
+    // 当前竞技场内玩家列表
+    private final List<UUID> gamePlayers = new ArrayList<>();
     private final String world;
     private String arenaName;
-    private int min, max, size;
+    private int min, max, size, borderInterval;
     private GameStatus status;
     private GameLocType gameLocType;
-    private int tempSize;
     private Location waitLoc, endLoc;
+    // 下方全为游戏临时数据
+    private int waitTime, tempSize, borderTime;
+    private BukkitTask startingTask, borderTask;
+
 
     public GameArena(File file) {
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -32,22 +36,32 @@ public class GameArena {
         max = data.getInt("max");
         world = data.getString("world");
         size = data.getInt("size");
-        tempSize = size;
         arenaName = ChatColor.translateAlternateColorCodes('&',
                 data.getString("display-name"));
+        borderInterval = data.getInt("world-");
 
         if (data.contains("loc-type")) {
             gameLocType = GameLocType.valueOf(data.getString("loc-type"));
         }
         loadLoc(data);
 
-        if (world != null && waitLoc != null && endLoc != null && gameLocType != null && min >= 2) {
-            init();
-        }
+        World world = Bukkit.getWorld(this.world);
+
+        if (world != null && waitLoc != null && endLoc != null && gameLocType != null && min >= 2) init();
     }
 
+    /**
+     * 初始化竞技场
+     */
     public void init() {
-
+        status = GameStatus.WAITING;
+        // 设置世界边界大小
+        World world = Bukkit.getWorld(this.world);
+        world.getWorldBorder().setSize(size);
+        world.getWorldBorder().setCenter(getInitLocation(world));
+        // 结束线程
+        if (startingTask != null) startingTask.cancel();
+        if (borderTask != null) borderTask.cancel();
     }
 
     /**
@@ -158,6 +172,7 @@ public class GameArena {
         playerMap.put(player.getUniqueId(), new PlayerTempData(player));
         player.sendMessage(DeathSwap.getLangData().getString("message.join", true)
                 .replace("%now%", String.valueOf(playerMap.size())).replace("%max%", String.valueOf(max)));
+        checkStatus();
         return true;
     }
 
@@ -170,7 +185,10 @@ public class GameArena {
         if (playerMap.containsKey(player.getUniqueId())) {
             // 恢复玩家背包
             playerMap.get(player.getUniqueId()).restore();
+            gamePlayers.remove(player.getUniqueId());
+            playerMap.remove(player.getUniqueId());
             TeleportManager.teleportEndLocation(player, endLoc);
+            checkStatus();
             return true;
         }
         return false;
@@ -183,6 +201,36 @@ public class GameArena {
      */
     public void onDeath(Player player) {
 
+    }
+
+    /**
+     * 检测房间状态
+     */
+    public void checkStatus() {
+        if (status == GameStatus.STARTING) {
+            if (playerMap.size() < min) {
+                waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
+                startingTask.cancel();
+                status = GameStatus.WAITING;
+            }
+        } else if (status == GameStatus.STARTED && gamePlayers.size() == 1) {
+            normalEnd(gamePlayers.get(0));
+        } else if (status == GameStatus.WAITING && playerMap.size() >= min) {
+            status = GameStatus.STARTING;
+            waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
+            startingTask = Bukkit.getScheduler().runTaskTimerAsynchronously(DeathSwap.getInstance(), () -> {
+                if (waitTime <= 0) {
+                    Bukkit.getScheduler().runTask(DeathSwap.getInstance(), this::start);
+                    startingTask.cancel();
+                    return;
+                }
+                if (waitTime <= 5) {
+                    sendAllPlayerText(DeathSwap.getLangData().getString("message.game-starting", true)
+                            .replace("%time%", String.valueOf(waitTime)));
+                }
+                waitTime--;
+            }, 20L, 20L);
+        }
     }
 
     /**
@@ -205,15 +253,55 @@ public class GameArena {
             // 设置世界出生点及世界边界大小
             World w = Bukkit.getWorld(world);
             WorldBorder border = w.getWorldBorder();
-            // 设置初始坐标
-            border.setCenter(getInitLocation(w));
+            border.setSize(size);
             // 游戏房间
             for (Map.Entry<UUID, PlayerTempData> entry : playerMap.entrySet()) {
                 Player player = Bukkit.getPlayer(entry.getKey());
                 Location rc = randomLocation(size - 1);
                 player.teleport(rc, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                gamePlayers.add(player.getUniqueId());
             }
+            tempSize = size;
+            // 开启缩圈线程
+            borderTask = Bukkit.getScheduler().runTaskTimerAsynchronously(DeathSwap.getInstance(), () -> {
+                if (size <= 5) return;
+                World world = Bukkit.getWorld(this.world);
+                WorldBorder worldBorder = world.getWorldBorder();
+                if (worldBorder.getSize() > tempSize) return;
+                if (borderTime == 0) {
+                    // 设置边界缩圈时间
+                    borderTime = borderInterval;
+                    // 计算缩圈
+                    worldBorder.setWarningDistance(0);
+                    worldBorder.setDamageAmount(2);
+                    worldBorder.setSize(tempSize / 2.0, borderInterval);
+                    size /= 2;
+                }
+                borderTime--;
+            }, 20L, 20L);
         }
+    }
+
+    /**
+     * 游戏正常结束
+     */
+    public void normalEnd(UUID uuid) {
+        Player winner = Bukkit.getPlayer(uuid);
+    }
+
+    /**
+     * 强制结束游戏
+     */
+    public void forceEnd() {
+        for (Map.Entry<UUID, PlayerTempData> entry : new HashSet<>(playerMap.entrySet())) {
+            entry.getValue().restore();
+            playerMap.remove(entry.getKey());
+            Player player = Bukkit.getPlayer(entry.getKey());
+            TeleportManager.teleportEndLocation(player, endLoc);
+        }
+        gamePlayers.clear();
+        playerMap.clear();
+        waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
     }
 
     private Location getInitLocation(World world) {

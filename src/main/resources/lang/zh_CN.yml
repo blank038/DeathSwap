@@ -35,6 +35,7 @@ message:
   arena-full: "竞技场已满人, 无法加入."
   join: "成功加入竞技场. &b(%now%/%max%)"
   not-in-arena: "你没有加入任何竞技场."
+  game-starting: "游戏即将开始, 倒计时: %time%秒."
   game-status:
     error: "出现异常, 请联系管理员."
     end: "游戏结束打扫中, 无法加入游戏."
