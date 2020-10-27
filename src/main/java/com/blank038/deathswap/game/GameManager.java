@@ -1,7 +1,6 @@
 package com.blank038.deathswap.game;
 
 import com.blank038.deathswap.DeathSwap;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -16,7 +15,10 @@ public class GameManager {
     }
 
     public void submitJoin(Player player, String arenaKey) {
-
+        if (arenaKey == null || !arenaMap.containsKey(arenaKey)) {
+            player.sendMessage(DeathSwap.getLangData().getString("message.arena-not-exists", true));
+            return;
+        }
     }
 
     public void submitQuit(Player player, boolean force) {
@@ -25,12 +27,14 @@ public class GameManager {
         }
     }
 
-    public void start(){}
+    public void start() {
+    }
 
-    public void stop(){}
+    public void stop() {
+    }
 
 
-    public GameArena getArena(String arenaName){
+    public GameArena getArena(String arenaName) {
 
         return arenaMap.get(arenaName);
 

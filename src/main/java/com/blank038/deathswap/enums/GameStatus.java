@@ -4,5 +4,6 @@ public enum GameStatus {
     WAITING,
     STARTING,
     STARTED,
-    END
+    END,
+    ERROR
 }
