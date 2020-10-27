@@ -1,4 +1,4 @@
-package com.blank038.deathswap.data;
+package com.blank038.deathswap.game.data;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

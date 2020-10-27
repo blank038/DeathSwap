@@ -1,14 +1,17 @@
-package com.blank038.deathswap.data;
+package com.blank038.deathswap.game;
 
+import com.blank038.deathswap.game.data.PlayerTempData;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class GameArena {
     private final int min, max, size;
+    private final HashMap<String, PlayerTempData> playerMap = new HashMap<>();
     private String world, arenaName;
 
     public GameArena(File file) {
@@ -43,6 +46,10 @@ public class GameArena {
     }
 
     public void quit(Player player, boolean force) {
+
+    }
+
+    public void onDeath(Player player) {
 
     }
 }
