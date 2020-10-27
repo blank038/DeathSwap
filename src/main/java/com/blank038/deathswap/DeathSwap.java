@@ -30,7 +30,6 @@ public class DeathSwap extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-
         inst = this;
         // 载入配置文件
         loadConfig();

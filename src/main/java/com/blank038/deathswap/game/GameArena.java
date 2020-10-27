@@ -34,6 +34,12 @@ public class GameArena {
         size = data.getInt("size");
         arenaName = ChatColor.translateAlternateColorCodes('&',
                 data.getString("display-name"));
+
+        loadLoc(data);
+
+        if (waitLoc != null && endLoc != null && gameLocType != null && min >= 2) {
+            init();
+        }
     }
 
     public GameArena(String world, String arenaName) {
@@ -42,6 +48,17 @@ public class GameArena {
         max = 8;
         size = 100;
         this.arenaName = ChatColor.translateAlternateColorCodes('&', arenaName);
+        if (waitLoc != null && endLoc != null && gameLocType != null && min >= 2) {
+            init();
+        }
+    }
+
+    public void init() {
+
+    }
+
+    public void loadLoc(FileConfiguration data) {
+
     }
 
     public String getArenaName() {
@@ -88,6 +105,10 @@ public class GameArena {
         return playerMap.containsKey(player.getUniqueId());
     }
 
+    public GameStatus getGameStatus() {
+        return status;
+    }
+
     /**
      * 玩家加入当前竞技场
      */
@@ -97,7 +118,7 @@ public class GameArena {
             return false;
         }
         if (playerMap.size() >= max) {
-            player.sendMessage(DeathSwap.getLangData().getString("message.max-player", true));
+            player.sendMessage(DeathSwap.getLangData().getString("message.arena-full", true));
             return false;
         }
         // 传送玩家
