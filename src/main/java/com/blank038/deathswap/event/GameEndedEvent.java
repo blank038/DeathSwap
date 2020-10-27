@@ -3,9 +3,9 @@ package com.blank038.deathswap.event;
 import com.blank038.deathswap.game.GameArena;
 import org.bukkit.entity.Player;
 
-public class GameQuitEvent extends GamePlayerEvent {
+public class GameEndedEvent extends GamePlayerEvent {
 
-    public GameQuitEvent(Player player, GameArena arena) {
+    public GameEndedEvent(Player player, GameArena arena) {
         super(player, arena);
     }
 }
