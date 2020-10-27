@@ -13,12 +13,12 @@ public class LangData {
     private FileConfiguration defLang, secLang;
 
     public LangData(DeathSwap inst) {
-        INSTANCE  = inst;
+        INSTANCE = inst;
         init();
     }
 
     public void init() {
-        // start check lang directory and lang file.
+        // 开始检测语言目录及语言文件
         File path = new File(INSTANCE.getDataFolder(), "lang");
         if (!path.exists()) path.mkdir();
         File defFile = new File(path, "zh_CN.yml");
@@ -26,7 +26,7 @@ public class LangData {
             CoreUtil.outputFile(INSTANCE.getResource("/lang/zh_CN.yml"), defFile);
         }
         secLang = YamlConfiguration.loadConfiguration(defFile);
-        // start to load config option lang file.
+        // 开始载入配置文件设定语言文件
         String lang = INSTANCE.getConfig().getString("lang");
         File langFile = new File(path, lang + ".yml");
         if (!langFile.exists()) {

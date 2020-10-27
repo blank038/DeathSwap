@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * An like UHC(Survival Game) minigame plugin.
+ * 一个类似于 UHC(生存游戏) 的小游戏插件.
  *
  * @author Blank038, Laotou
  */
@@ -24,27 +25,27 @@ public class DeathSwap extends JavaPlugin {
     }
 
     /**
-     * Initialize DeathSwap.
+     * 初始化插件
      */
     @Override
     public void onEnable() {
 
         inst = this;
-        // load config.
+        // 载入配置文件
         loadConfig();
-        // register plugin listener.
+        // 注册事件监听器
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        // set plugin command executor.
+        // 注册命令执行器
         getCommand("deathswap").setExecutor(new MainCommand());
     }
 
     /**
-     * Configuration file initialize and reload.
+     * 配置文件初始化和重载
      */
     public void loadConfig() {
         saveDefaultConfig();
         reloadConfig();
-        // variable langData initialize.
+        // 变量 loadData 初始化
         if (langData == null) langData = new LangData(this);
         else langData.init();
     }

@@ -1,7 +1,11 @@
 package com.blank038.deathswap.game;
 
+import com.blank038.deathswap.enums.GameStatus;
 import com.blank038.deathswap.game.data.PlayerTempData;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -14,6 +18,8 @@ public class GameArena {
     private final String world;
     private String arenaName;
     private int min, max, size;
+    private GameStatus status;
+    private int tempSize;
 
     public GameArena(File file) {
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
@@ -71,28 +77,42 @@ public class GameArena {
     }
 
     /**
-     * Player try to join this arena.
+     * 玩家加入当前竞技场
      */
     public void join(Player player) {
 
     }
 
     /**
-     * On player quit arena or quit server.
+     * 玩家退出竞技场或离开服务器
      *
-     * @param player Target player.
-     * @param force  Is force quit?
+     * @param player 目标玩家
+     * @param force  是否为强制退出
      */
     public void quit(Player player, boolean force) {
 
     }
 
     /**
-     * Player died trigger.
+     * 玩家死亡触发
      *
-     * @param player Target player.
+     * @param player 目标玩家
      */
     public void onDeath(Player player) {
 
+    }
+
+    /**
+     * 开始竞技场
+     */
+    public void start() {
+        if (status == GameStatus.STARTING) {
+            // 修改竞技场状态
+            status = GameStatus.STARTED;
+            // 设置世界出生点及世界边界大小
+            World w = Bukkit.getWorld(world);
+            WorldBorder border = w.getWorldBorder();
+
+        }
     }
 }
