@@ -34,3 +34,4 @@ message:
   reload: "插件配置重载完成."
   does-not-exist: "&c竞技场不存在."
   format-error-int: "&c参数格式错误,请输入数字参数."
+  setup: "&c设置成功"

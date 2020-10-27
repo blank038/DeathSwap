@@ -6,6 +6,7 @@ import com.blank038.deathswap.util.CoreUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class MainCommand implements CommandExecutor {
     private final DeathSwap INSTANCE;
@@ -16,7 +17,7 @@ public class MainCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
-        if (sender.isOp() && args.length >= 2 && args[0].equalsIgnoreCase("editor")){
+        if (sender.isOp() && args.length >= 3 && args[0].equalsIgnoreCase("editor")){
             GameArena arena = INSTANCE.gameManager.getArena(args[2]);
             if (arena == null) {
                 sender.sendMessage(DeathSwap.getLangData().getString("message.does-not-exist",true));
@@ -30,6 +31,7 @@ public class MainCommand implements CommandExecutor {
                             sender.sendMessage(DeathSwap.getLangData().getString("format-error-int",true));
                         }else {
                             arena.setMin(Integer.parseInt(arg_4));
+                            setupMessage(sender);
                         }
                         return true;
                     case "max":
@@ -38,18 +40,60 @@ public class MainCommand implements CommandExecutor {
                             sender.sendMessage(DeathSwap.getLangData().getString("format-error-int",true));
                         }else {
                             arena.setMax(Integer.parseInt(arg_4));
+                            setupMessage(sender);
+                        }
+                        return true;
+
+                    case "wbiv":
+                        if (!CoreUtil.isInteger(arg_4)){
+                            sender.sendMessage(DeathSwap.getLangData().getString("format-error-int",true));
+                        }else {
+                           /*
+                                设置缩圈间隔
+                            */
+                            setupMessage(sender);
+                        }
+                        return true;
+                    case "tiv":
+                        if (!CoreUtil.isInteger(arg_4)){
+                            sender.sendMessage(DeathSwap.getLangData().getString("format-error-int",true));
+                        }else {
+                            /*
+                                设置传送间隔
+                             */
+                            setupMessage(sender);
+                        }
+                        return true;
+                    case "size":
+                        if (!CoreUtil.isInteger(arg_4)){
+                            sender.sendMessage(DeathSwap.getLangData().getString("format-error-int",true));
+                        }else {
+                            arena.setWorldBorderSize(Integer.parseInt(arg_4));
+                            setupMessage(sender);
                         }
                         return true;
 
                     case "name":
 
                         arena.setDisplayName(arg_4);
+                        setupMessage(sender);
+                        return true;
+                     case "type":
+
+                        //arena.set(arg_4);
+                        setupMessage(sender);
                         return true;
 
                     default:
                         return false;
 
                 }
+            }
+            if (args[1].equalsIgnoreCase("end")){
+
+            }
+            if (args[1].equalsIgnoreCase("wait")){
+
             }
 
 
@@ -58,6 +102,13 @@ public class MainCommand implements CommandExecutor {
         return false;
     }
 
+
+    public void setupMessage(CommandSender player){
+        player.sendMessage(DeathSwap.getLangData().getString("setup",true));
+
+
+
+    }
 
 
 }
