@@ -1,6 +1,7 @@
 package com.blank038.deathswap.game;
 
 import com.blank038.deathswap.DeathSwap;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -28,5 +29,11 @@ public class GameManager {
 
     public void stop(){}
 
+
+    public GameArena getArena(String arenaName){
+
+        return arenaMap.get(arenaName);
+
+    }
 
 }

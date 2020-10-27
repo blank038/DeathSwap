@@ -1,6 +1,6 @@
 # 提示文本
 message:
-  prefix: "&b死亡旋转 &f"
+  prefix: "&7[&e死亡旋转&7] &f"
   help:
     defafult:
       - ""
@@ -32,3 +32,5 @@ message:
       - "   &a/%c &feditor type <竞技场> <类型> &7设置中心坐标类型"
       - ""
   reload: "插件配置重载完成."
+  does-not-exist: "&c竞技场不存在."
+  format-error-int: "&c参数格式错误,请输入数字参数."

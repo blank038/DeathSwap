@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.regex.Pattern;
 
 public class CoreUtil {
 
@@ -21,5 +22,10 @@ public class CoreUtil {
             in.close();
         } catch (Exception ignored) {
         }
+    }
+
+    public static boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
     }
 }

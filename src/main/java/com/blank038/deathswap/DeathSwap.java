@@ -2,6 +2,7 @@ package com.blank038.deathswap;
 
 import com.blank038.deathswap.command.MainCommand;
 import com.blank038.deathswap.configuration.LangData;
+import com.blank038.deathswap.game.GameManager;
 import com.blank038.deathswap.listener.PlayerListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class DeathSwap extends JavaPlugin {
     private static DeathSwap inst;
     private static LangData langData;
-
+    public GameManager gameManager;
     public static DeathSwap getInstance() {
         return inst;
     }
@@ -37,6 +38,8 @@ public class DeathSwap extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         // 注册命令执行器
         getCommand("deathswap").setExecutor(new MainCommand());
+        //载入竞技场管理器
+        gameManager = new GameManager();
     }
 
     /**
