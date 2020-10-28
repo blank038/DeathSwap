@@ -7,6 +7,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LangData {
     private final DeathSwap INSTANCE;
@@ -40,5 +42,15 @@ public class LangData {
                 secLang.getString("message.prefix")) : "";
         return ChatColor.translateAlternateColorCodes('&',
                 header + defLang.getString(key, secLang.getString(key)));
+    }
+
+    public List<String> getStringList(String key, boolean prefix) {
+        List<String> list = new ArrayList<>();
+        String header = prefix ? defLang.getString("message.prefix",
+                secLang.getString("message.prefix")) : "";
+        for (String i : defLang.getStringList(key)) {
+            list.add(ChatColor.translateAlternateColorCodes('&', header + i));
+        }
+        return list;
     }
 }

@@ -1,6 +1,7 @@
 package com.blank038.deathswap.game;
 
 import com.blank038.deathswap.DeathSwap;
+import com.blank038.deathswap.enums.EditorType;
 import com.blank038.deathswap.enums.GameLocType;
 import com.blank038.deathswap.enums.GameStatus;
 import com.blank038.deathswap.game.data.PlayerTempData;
@@ -19,8 +20,11 @@ public class GameArena {
     // 当前竞技场内玩家列表
     private final List<UUID> gamePlayers = new ArrayList<>();
     private final String world;
+    private final int borderInterval;
     private String arenaName;
-    private int min, max, size, borderInterval;
+    private int min;
+    private int max;
+    private int size;
     private GameStatus status;
     private GameLocType gameLocType;
     private Location waitLoc, endLoc;
@@ -302,6 +306,16 @@ public class GameArena {
         gamePlayers.clear();
         playerMap.clear();
         waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
+    }
+
+    /**
+     * 编辑竞技场信息
+     *
+     * @param type   编辑类型
+     * @param object 编辑数据
+     */
+    public void editorData(EditorType type, Object object) {
+
     }
 
     private Location getInitLocation(World world) {

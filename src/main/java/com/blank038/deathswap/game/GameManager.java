@@ -45,7 +45,7 @@ public class GameManager {
     }
 
     public GameArena getArena(String arenaName) {
-        return arenaMap.get(arenaName);
+        return arenaMap.getOrDefault(arenaName, null);
     }
 
     public boolean hasArena(String key) {
