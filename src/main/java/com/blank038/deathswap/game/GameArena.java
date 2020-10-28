@@ -6,6 +6,7 @@ import com.blank038.deathswap.enums.GameLocType;
 import com.blank038.deathswap.enums.GameStatus;
 import com.blank038.deathswap.game.data.PlayerTempData;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -13,14 +14,16 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class GameArena {
+    private final File file;
     private final HashMap<UUID, PlayerTempData> playerMap = new HashMap<>();
     // 当前竞技场内玩家列表
     private final List<UUID> gamePlayers = new ArrayList<>();
     private final String world;
-    private final int borderInterval;
+    private int borderInterval, teleportInterval;
     private String arenaName;
     private int min;
     private int max;
@@ -34,6 +37,7 @@ public class GameArena {
 
 
     public GameArena(File file) {
+        this.file = file;
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
 
         min = data.getInt("min");
@@ -42,7 +46,8 @@ public class GameArena {
         size = data.getInt("size");
         arenaName = ChatColor.translateAlternateColorCodes('&',
                 data.getString("display-name"));
-        borderInterval = data.getInt("world-");
+        borderInterval = data.getInt("wb-interval");
+        teleportInterval = data.getInt("tp-interval");
 
         if (data.contains("loc-type")) {
             gameLocType = GameLocType.valueOf(data.getString("loc-type"));
@@ -315,7 +320,67 @@ public class GameArena {
      * @param object 编辑数据
      */
     public void editorData(EditorType type, Object object) {
+        switch (type) {
+            case MIN:
+                min = (int) object;
+                setArenaConfig("min", object);
+                break;
+            case MAX:
+                max = (int) object;
+                setArenaConfig("max", object);
+                break;
+            case END:
+                endLoc = ((Location) object).clone();
+                setArenaConfig("end-pos", locationToSection(endLoc));
+                break;
+            case WAIT:
+                waitLoc = ((Location) object).clone();
+                setArenaConfig("wait-pos", locationToSection(waitLoc));
+                break;
+            case TIV:
+                teleportInterval = (int) object;
+                setArenaConfig("tp-interval", teleportInterval);
+                break;
+            case NAME:
+                arenaName = ChatColor.translateAlternateColorCodes('&', (String) object);
+                setArenaConfig("display-name", arenaName);
+                break;
+            case SIZE:
+                size = (int) object;
+                setArenaConfig("size", size);
+                break;
+            case TYPE:
+                gameLocType = (int) object == 0 ? GameLocType.RANDOM : GameLocType.SPAWN_LOC;
+                setArenaConfig("loc-type", gameLocType.name());
+                break;
+            case WBIV:
+                borderInterval = (int) object;
+                setArenaConfig("wb-interval", borderInterval);
+                break;
+            default:
+                break;
+        }
+    }
 
+    public void setArenaConfig(String key, Object obj) {
+        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+        data.set(key, obj);
+        try {
+            data.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ConfigurationSection locationToSection(Location location) {
+        ConfigurationSection section = new YamlConfiguration();
+        section.set("world", location.getWorld().getName());
+        section.set("x", location.getX());
+        section.set("y", location.getY());
+        section.set("z", location.getZ());
+        section.set("yaw", location.getYaw());
+        section.set("pitch", location.getPitch());
+        return section;
     }
 
     private Location getInitLocation(World world) {
