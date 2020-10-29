@@ -40,6 +40,10 @@ public class PlayerListener implements Listener {
         if (data != null) {
             data.save();
         }
+        GameArena arena = INSTANCE.getGameManager().getPlayerGame(event.getPlayer().getUniqueId());
+        if (arena != null) {
+            arena.quit(event.getPlayer());
+        }
     }
 
     @EventHandler

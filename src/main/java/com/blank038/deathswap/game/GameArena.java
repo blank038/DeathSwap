@@ -64,8 +64,7 @@ public class GameArena {
 
         loadLoc(data);
 
-        World world = Bukkit.getWorld(this.world);
-        if (world != null && waitLoc != null && endLoc != null && gameLocType != null && min >= 2 && size > 0) {
+        if (waitLoc != null && endLoc != null && gameLocType != null && min >= 2 && size > 0) {
             init();
         }
     }
@@ -75,9 +74,16 @@ public class GameArena {
      */
     public void init() {
         status = GameStatus.WAITING;
+
+        waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
+        tempSize = size;
+        swapTime = teleportInterval;
+        borderTime = borderInterval;
+
         gamePlayers.clear();
         playerMap.clear();
         allowTpList.clear();
+
         // 结束线程
         if (startingTask != null) {
             startingTask.cancel();
@@ -91,6 +97,7 @@ public class GameArena {
         if (swapData != null) {
             swapData.reset();
         }
+
         if (scoreBoardManager == null) {
             scoreBoardManager = new ScoreBoardManager(this);
         } else {
@@ -218,6 +225,11 @@ public class GameArena {
         }
         if (playerMap.size() >= max) {
             player.sendMessage(DeathSwap.getLangData().getString("message.arena-full", true));
+            return false;
+        }
+        World world = Bukkit.getWorld(this.world);
+        if (world == null) {
+            player.sendMessage(DeathSwap.getLangData().getString("message.game-status.error", true));
             return false;
         }
         // 传送玩家
@@ -394,7 +406,7 @@ public class GameArena {
                     // 计算缩圈
                     worldBorder.setWarningDistance(0);
                     worldBorder.setDamageAmount(1);
-                    worldBorder.setSize(tempSize, borderInterval);
+                    worldBorder.setSize(tempSize, 60);
                 }
                 borderTime--;
             }, 20L, 20L);
