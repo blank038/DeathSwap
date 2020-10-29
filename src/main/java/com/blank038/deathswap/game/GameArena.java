@@ -28,7 +28,7 @@ public class GameArena {
     private int min;
     private int max;
     private int size;
-    private GameStatus status;
+    private GameStatus status = GameStatus.ERROR;
     private GameLocType gameLocType;
     private Location waitLoc, endLoc;
     // 下方全为游戏临时数据
@@ -117,24 +117,12 @@ public class GameArena {
         return arenaName;
     }
 
-    public void setDisplayName(String name) {
-        arenaName = ChatColor.translateAlternateColorCodes('&', name);
-    }
-
     public int getMin() {
         return min;
     }
 
-    public void setMin(int min) {
-        this.min = min;
-    }
-
     public int getMax() {
         return max;
-    }
-
-    public void setMax(int max) {
-        this.max = max;
     }
 
     public String getGameWorld() {
@@ -143,10 +131,6 @@ public class GameArena {
 
     public int getWorldBorderSize() {
         return size;
-    }
-
-    public void setWorldBorderSize(int size) {
-        this.size = size;
     }
 
     public int getPlayerCount() {

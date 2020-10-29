@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.IOException;
 
 public class DeathSwapApi {
     private final DeathSwap INSTANCE;
@@ -15,7 +16,7 @@ public class DeathSwapApi {
         INSTANCE = DeathSwap.getInstance();
     }
 
-    public boolean createArena(Player player, String arenaName, String world) {
+    public boolean createArena(String arenaName, String world) {
         if (INSTANCE.getGameManager().hasArena(arenaName)) return false;
         File file = new File(INSTANCE.getDataFolder() + "/arenas/", arenaName + ".yml");
         FileConfiguration data = new YamlConfiguration();
@@ -25,6 +26,12 @@ public class DeathSwapApi {
         data.set("display-name", arenaName);
         data.set("world", world);
         data.set("loc-type", GameLocType.RANDOM.name());
+        try {
+            data.save(file);
+        } catch (IOException e) {
+            INSTANCE.getLogger().info("异常: " + e.getLocalizedMessage());
+            return false;
+        }
         return true;
     }
 }

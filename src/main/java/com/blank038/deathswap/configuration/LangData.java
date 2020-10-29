@@ -25,14 +25,14 @@ public class LangData {
         if (!path.exists()) path.mkdir();
         File defFile = new File(path, "zh_CN.yml");
         if (!defFile.exists()) {
-            CoreUtil.outputFile(INSTANCE.getResource("/lang/zh_CN.yml"), defFile);
+            CoreUtil.outputFile(INSTANCE.getResource("lang/zh_CN.yml"), defFile);
         }
         secLang = YamlConfiguration.loadConfiguration(defFile);
         // 开始载入配置文件设定语言文件
         String lang = INSTANCE.getConfig().getString("lang");
         File langFile = new File(path, lang + ".yml");
         if (!langFile.exists()) {
-            CoreUtil.outputFile(INSTANCE.getResource("/lang/" + lang + ".yml"), langFile);
+            CoreUtil.outputFile(INSTANCE.getResource("lang/" + lang + ".yml"), langFile);
         }
         defLang = YamlConfiguration.loadConfiguration(langFile);
     }

@@ -1,6 +1,6 @@
 # 提示文本
 message:
-  prefix: "&7[&e死亡旋转&7] &f"
+  prefix: "&e死亡旋转 &f"
   help:
     defafult:
       - ""
@@ -33,17 +33,22 @@ message:
       - ""
   in-arena: "你已经竞技场中, 无法重复加入."
   need-arena-key: "请输入竞技场名."
+  need-world-name: "请输入世界名."
   arena-full: "竞技场已满人, 无法加入."
   join: "成功加入竞技场. &b(%now%/%max%)"
   not-in-arena: "你没有加入任何竞技场."
   game-starting: "游戏即将开始, 倒计时: %time%秒."
+  create:
+    error-world: "世界不存在."
+    arena-exists: "竞技场已存在."
+    success: "成功创建竞技场."
+    error: "出现异常, 请检查后台日志."
   game-status:
     error: "出现异常, 请联系管理员."
     end: "游戏结束打扫中, 无法加入游戏."
     started: "游戏已开始, 无法加入."
   arena-not-exist: "&c竞技场不存在."
   editor:
-    err-args: "请输入编辑类型."
     err-type: "请输入正确的类型."
     err-arena: "请输入竞技场名."
     err-value: "请输入要设置的值."
