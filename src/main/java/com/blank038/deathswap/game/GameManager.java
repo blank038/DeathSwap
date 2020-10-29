@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * @author Blank038
+ */
 public class GameManager {
     private final DeathSwap INSTANCE;
     private final HashMap<String, GameArena> arenaMap = new HashMap<>();
@@ -49,13 +52,14 @@ public class GameManager {
             player.sendMessage(DeathSwap.getLangData().getString("message.game-status." + status.name().toLowerCase(), true));
             return;
         }
-        if (arenaMap.get(arenaKey).join(player)) playerMap.put(player.getUniqueId(), arenaKey);
+        if (arenaMap.get(arenaKey).join(player)) {
+            playerMap.put(player.getUniqueId(), arenaKey);
+        }
     }
 
     public void submitQuit(Player player) {
         if (playerMap.containsKey(player.getUniqueId())) {
             if (arenaMap.get(playerMap.get(player.getUniqueId())).quit(player)) {
-                playerMap.remove(player.getUniqueId());
                 player.sendMessage(DeathSwap.getLangData().getString("message.quit", true));
             }
         } else {
@@ -69,8 +73,20 @@ public class GameManager {
         }
     }
 
+    public void removePlayer(UUID uuid) {
+        playerMap.remove(uuid);
+    }
+
     public GameArena getArena(String arenaName) {
         return arenaMap.getOrDefault(arenaName, null);
+    }
+
+    public GameArena getPlayerGame(UUID uuid) {
+        if (!playerMap.containsKey(uuid)) {
+            return null;
+        }
+        String arenaKey = playerMap.get(uuid);
+        return arenaMap.getOrDefault(arenaKey, null);
     }
 
     public boolean hasArena(String key) {

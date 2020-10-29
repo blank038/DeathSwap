@@ -10,10 +10,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * @author Blank038
+ */
 public class TeleportManager {
 
     public static void teleportEndLocation(Player player, Location location) {
-        if (DeathSwap.getInstance().getConfig().getBoolean("game-option.bungee")) {
+        String key = "game-option.bungee";
+        if (DeathSwap.getInstance().getConfig().getBoolean(key)) {
             // 开始传送
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
@@ -27,7 +31,9 @@ public class TeleportManager {
             }
         } else {
             Chunk chunk = location.getChunk();
-            if (!chunk.isLoaded()) chunk.load();
+            if (!chunk.isLoaded()) {
+                chunk.load();
+            }
             player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
         }
     }

@@ -1,17 +1,17 @@
 # 提示文本
 message:
-  prefix: "&e死亡旋转 &f"
+  prefix: "&e死亡翻转 &f"
   help:
     defafult:
       - ""
-      - " &d&l死亡旋转"
+      - " &d&l死亡翻转"
       - "   &a/%c &fjoin <竞技场> &7加入指定竞技场"
       - "   &a/%c &fquit &7离开当前竞技场"
       - "   &a/%c &finfo &7查询我的游戏信息"
       - ""
     admin:
       - ""
-      - " &d&l死亡旋转"
+      - " &d&l死亡翻转"
       - "   &a/%c &fcreate <竞技场> <世界名> &7创建竞技场"
       - "   &a/%c &fedtior &7查看竞技场编辑命令"
       - "   &a/%c &fjoin <竞技场> &7加入指定竞技场"
@@ -21,7 +21,7 @@ message:
       - ""
     editor:
       - ""
-      - " &d&l死亡旋转"
+      - " &d&l死亡翻转"
       - "   &a/%c &feditor min <竞技场> <人数> &7设置最少人数"
       - "   &a/%c &feditor max <竞技场> <人数> &7设置人数上限"
       - "   &a/%c &fedtior name <竞技场> <名称> &7设置展示名"
@@ -65,4 +65,12 @@ message:
     run: "&c缩圈中"
     wait: "&e%time%s 后缩圈"
   quit: "已退出竞技场."
+  game-started: "游戏开始, 冲冲冲!"
+  kill-message:
+    damage: "你击杀了 &a%player%"
+    swap: "&a%player% &f因你的陷阱而死."
+    damage-notify: "&a%player% &f击杀了 &a%target%"
+    swap-notify: "&a%player% &f因 &a%target% &f的陷阱而死."
+    die: "&a%player% &f死了."
+  tp-countdown: "即将进行翻转, 倒计时: %time%"
   reload: "插件配置重载完成."
