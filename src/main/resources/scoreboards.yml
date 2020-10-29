@@ -1,0 +1,35 @@
+# 等待时的计分板
+waiting:
+  title: "&e死亡翻转"
+  info:
+    - "&7%date%"
+    - ""
+    - "&f地图: &a%map%"
+    - "&f玩家: &a%now%/%max%"
+    - ""
+    - "&f状态: &a%status%"
+    - ""
+    - "&eDeathSwap"
+# 游戏时的计分板
+started:
+  title: "&e死亡翻转"
+  info:
+    - "&7%date%"
+    - ""
+    - "&f击败: &a%kill%"
+    - "&f存活: &a%now%"
+    - ""
+    - "&f边界: &a%status%"
+    - "&f转换: &a%swap%s"
+    - ""
+    - "&eDeathSwap"
+# 结束时的计分板
+end:
+  title: "&e死亡翻转"
+  info:
+    - "&7%date%"
+    - ""
+    - "&f最终胜利: &a%winner%"
+    - "&f对方击败: &a%kill%"
+    - ""
+    - "&eDeathSwap"

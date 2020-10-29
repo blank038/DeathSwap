@@ -39,6 +39,12 @@ public class MainCommand implements CommandExecutor {
                 case "create":
                     create(sender, args);
                     break;
+                case "reload":
+                    if (sender.hasPermission("deathswap.admin")) {
+                        INSTANCE.loadConfig();
+                        sender.sendMessage(DeathSwap.getLangData().getString("message.reload", true));
+                    }
+                    break;
                 default:
                     sendHelp(sender, s);
                     break;

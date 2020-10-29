@@ -2,9 +2,9 @@ package com.blank038.deathswap.api;
 
 import com.blank038.deathswap.DeathSwap;
 import com.blank038.deathswap.enums.GameLocType;
+import com.blank038.deathswap.game.GameArena;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +23,8 @@ public class DeathSwapApi {
         data.set("min", 2);
         data.set("max", 8);
         data.set("size", 100);
+        data.set("wb-interval", 50);
+        data.set("tp-interval", 300);
         data.set("display-name", arenaName);
         data.set("world", world);
         data.set("loc-type", GameLocType.RANDOM.name());
@@ -32,6 +34,7 @@ public class DeathSwapApi {
             INSTANCE.getLogger().info("异常: " + e.getLocalizedMessage());
             return false;
         }
+        INSTANCE.getGameManager().addArena(arenaName, new GameArena(file));
         return true;
     }
 }

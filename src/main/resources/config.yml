@@ -7,3 +7,5 @@ lang: zh_CN
 # 竞技场设置
 arena-option:
   wait-time: 10
+# 时间格式
+simple-date-format: "yyyy/MM/dd HH:mm:ss"

@@ -22,6 +22,8 @@ public class PlayerTempData {
     private final double health, maxHealth;
     // 玩家经验
     private final float exp;
+    // 对战信息
+    private int kill;
 
     public PlayerTempData(Player player) {
         this.uuid = player.getUniqueId();
@@ -41,6 +43,14 @@ public class PlayerTempData {
 
     public UUID getPlayerUUID() {
         return uuid;
+    }
+
+    public int getKillCount() {
+        return kill;
+    }
+
+    public void addKill() {
+        kill++;
     }
 
     public void restore() {

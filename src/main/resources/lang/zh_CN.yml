@@ -17,6 +17,7 @@ message:
       - "   &a/%c &fjoin <竞技场> &7加入指定竞技场"
       - "   &a/%c &fquit &7离开当前竞技场"
       - "   &a/%c &finfo &7查询我的游戏信息"
+      - "   &a/%c &freload &7重载插件配置文件"
       - ""
     editor:
       - ""
@@ -52,6 +53,16 @@ message:
     err-type: "请输入正确的类型."
     err-arena: "请输入竞技场名."
     err-value: "请输入要设置的值."
-    not-int: "参数格式错误,请输入数字参数."
+    not-number: "参数格式错误,请输入数字参数."
     set: "设置成功."
+  arena-status:
+    waiting: "等待中"
+    starting: "%time%s"
+    started: "已开始"
+    end: "已结束"
+    error: "出现错误"
+  world-broad-status:
+    run: "&c缩圈中"
+    wait: "&e%time%s 后缩圈"
+  quit: "已退出竞技场."
   reload: "插件配置重载完成."
