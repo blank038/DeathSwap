@@ -4,6 +4,9 @@ import com.blank038.deathswap.game.GameArena;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 
+/**
+ * @author Blank038
+ */
 public class GameJoinEvent extends GamePlayerEvent implements Cancellable {
     private boolean cancelled;
 

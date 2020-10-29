@@ -6,10 +6,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
 
+/**
+ * @author Blank038
+ */
 public class CoreUtil {
+    private static final Pattern PATTERN = Pattern.compile("^[-+]?[\\d]*$");
 
     public static void outputFile(InputStream in, File file) {
-        if (in == null) return;
+        if (in == null) {
+            return;
+        }
         try {
             file.createNewFile();
             OutputStream out = new FileOutputStream(file);
@@ -25,7 +31,6 @@ public class CoreUtil {
     }
 
     public static boolean isInteger(String str) {
-        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
-        return pattern.matcher(str).matches();
+        return PATTERN.matcher(str).matches();
     }
 }

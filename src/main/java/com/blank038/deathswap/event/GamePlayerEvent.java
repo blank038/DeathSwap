@@ -5,8 +5,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * @author Blank038
+ */
 public class GamePlayerEvent extends Event {
-    private static final HandlerList handlerList = new HandlerList();
+    private static final HandlerList HANDLER_LIST = new HandlerList();
     private final Player player;
     private final GameArena arena;
 
@@ -25,10 +28,10 @@ public class GamePlayerEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return handlerList;
+        return HANDLER_LIST;
     }
 
     public static HandlerList getHandlerList() {
-        return handlerList;
+        return HANDLER_LIST;
     }
 }

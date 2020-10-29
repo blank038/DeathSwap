@@ -9,6 +9,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Blank038
+ */
 public class DeathSwapApi {
     private final DeathSwap INSTANCE;
 
@@ -17,7 +20,9 @@ public class DeathSwapApi {
     }
 
     public boolean createArena(String arenaName, String world) {
-        if (INSTANCE.getGameManager().hasArena(arenaName)) return false;
+        if (INSTANCE.getGameManager().hasArena(arenaName)) {
+            return false;
+        }
         File file = new File(INSTANCE.getDataFolder() + "/arenas/", arenaName + ".yml");
         FileConfiguration data = new YamlConfiguration();
         data.set("min", 2);

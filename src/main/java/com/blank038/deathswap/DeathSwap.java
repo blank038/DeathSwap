@@ -67,7 +67,9 @@ public class DeathSwap extends JavaPlugin {
     public void onDisable() {
         for (Map.Entry<String, GameArena> entry : gameManager.allGame().entrySet()) {
             ScoreBoardManager sbm = entry.getValue().getScoreBoardManager();
-            if (sbm != null) sbm.clearScoreboard();
+            if (sbm != null) {
+                sbm.clearScoreboard();
+            }
         }
     }
 
@@ -78,10 +80,15 @@ public class DeathSwap extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
         // 变量 loadData 初始化
-        if (langData == null) langData = new LangData(this);
-        else langData.init();
+        if (langData == null) {
+            langData = new LangData(this);
+        } else {
+            langData.init();
+        }
 
         // 重载竞技场
-        if (gameManager != null) gameManager.loadGameArena();
+        if (gameManager != null) {
+            gameManager.loadGameArena();
+        }
     }
 }

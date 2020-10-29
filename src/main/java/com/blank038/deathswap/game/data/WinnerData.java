@@ -1,5 +1,8 @@
 package com.blank038.deathswap.game.data;
 
+/**
+ * @author Blank038
+ */
 public class WinnerData {
     private final String name;
     private final int kill;

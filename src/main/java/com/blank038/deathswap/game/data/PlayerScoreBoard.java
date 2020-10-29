@@ -11,6 +11,9 @@ import org.bukkit.scoreboard.Team;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Blank038
+ */
 public class PlayerScoreBoard {
     private final List<Team> teams = new ArrayList<>();
     private Scoreboard scoreboard;

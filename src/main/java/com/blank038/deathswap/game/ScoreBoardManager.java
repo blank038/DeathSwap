@@ -16,6 +16,9 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * @author Blank038
+ */
 public class ScoreBoardManager {
     private final GameArena game;
     private final HashMap<String, PlayerScoreBoard> playerMap = new HashMap<>();
@@ -40,7 +43,9 @@ public class ScoreBoardManager {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat(DeathSwap.getInstance().getConfig().getString("simple-date-format"));
         // 根据游戏状态发送计分板
-        if (gameStatus != this.gameStatus) refresh();
+        if (gameStatus != this.gameStatus) {
+            refresh();
+        }
         // 刷新玩家计分板
         switch (gameStatus) {
             case WAITING:

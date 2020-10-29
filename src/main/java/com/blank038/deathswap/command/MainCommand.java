@@ -11,6 +11,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * @author Blank038
+ */
 public class MainCommand implements CommandExecutor {
     private final DeathSwap INSTANCE;
 
@@ -99,10 +102,11 @@ public class MainCommand implements CommandExecutor {
                 sender.sendMessage(DeathSwap.getLangData().getString("message.create.arena-exists", true));
                 return;
             }
-            if (INSTANCE.getApi().createArena(args[1], args[2]))
+            if (INSTANCE.getApi().createArena(args[1], args[2])) {
                 sender.sendMessage(DeathSwap.getLangData().getString("message.create.success", true));
-            else
+            } else {
                 sender.sendMessage(DeathSwap.getLangData().getString("message.create.error", true));
+            }
         }
     }
 

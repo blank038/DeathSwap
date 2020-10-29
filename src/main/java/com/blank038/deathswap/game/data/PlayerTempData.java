@@ -12,17 +12,27 @@ import java.util.UUID;
 
 /**
  * 玩家数据备份类
+ *
+ * @author Blank038
  */
 public class PlayerTempData {
     private final UUID uuid;
     private final HashMap<Integer, ItemStack> oldInvItems = new HashMap<>();
-    // 玩家等级、饱食度等级
+    /**
+     * 玩家等级、饱食度等级
+     */
     private final int level, foodLevel;
-    // 剩余血量、最大血量
+    /**
+     * 剩余血量、最大血量
+     */
     private final double health, maxHealth;
-    // 玩家经验
+    /**
+     * 玩家经验
+     */
     private final float exp;
-    // 对战信息
+    /**
+     * 对战信息
+     */
     private int kill;
 
     public PlayerTempData(Player player) {
@@ -35,13 +45,15 @@ public class PlayerTempData {
         // 备份玩家背包
         for (int i = 0; i < player.getInventory().getSize(); i++) {
             ItemStack itemStack = player.getInventory().getItem(i);
-            if (itemStack == null || itemStack.getType() == Material.AIR) continue;
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                continue;
+            }
             oldInvItems.put(i, itemStack.clone());
         }
         player.getInventory().clear();
     }
 
-    public UUID getPlayerUUID() {
+    public UUID getPlayerUuid() {
         return uuid;
     }
 
@@ -54,7 +66,7 @@ public class PlayerTempData {
     }
 
     public void restore() {
-        Player player = Bukkit.getPlayer(getPlayerUUID());
+        Player player = Bukkit.getPlayer(getPlayerUuid());
         if (player != null && player.isOnline()) {
             player.setLevel(level);
             player.setExp(exp);
@@ -64,7 +76,9 @@ public class PlayerTempData {
             // 恢复背包
             player.getInventory().clear();
             for (Map.Entry<Integer, ItemStack> entry : oldInvItems.entrySet()) {
-                if (entry.getValue() == null) continue;
+                if (entry.getValue() == null) {
+                    continue;
+                }
                 player.getInventory().setItem(entry.getKey(), entry.getValue());
             }
         }

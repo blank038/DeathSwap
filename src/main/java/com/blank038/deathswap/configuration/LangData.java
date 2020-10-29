@@ -10,6 +10,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Blank038
+ */
 public class LangData {
     private final DeathSwap INSTANCE;
     private FileConfiguration defLang, secLang;
@@ -22,7 +25,9 @@ public class LangData {
     public void init() {
         // 开始检测语言目录及语言文件
         File path = new File(INSTANCE.getDataFolder(), "lang");
-        if (!path.exists()) path.mkdir();
+        if (!path.exists()) {
+            path.mkdir();
+        }
         File defFile = new File(path, "zh_CN.yml");
         if (!defFile.exists()) {
             CoreUtil.outputFile(INSTANCE.getResource("lang/zh_CN.yml"), defFile);
