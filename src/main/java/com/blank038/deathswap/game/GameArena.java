@@ -501,7 +501,10 @@ public class GameArena {
         GameEndedEvent event = new GameEndedEvent(winner, this, false);
         Bukkit.getPluginManager().callEvent(event);
 
-        Bukkit.getScheduler().runTaskLater(DeathSwap.getInstance(), this::init, 100L);
+        Bukkit.getScheduler().runTaskLater(DeathSwap.getInstance(), () -> {
+            init();
+            Bukkit.getServer().shutdown();
+        }, 100L);
     }
 
     /**
@@ -523,6 +526,11 @@ public class GameArena {
         gamePlayers.clear();
         playerMap.clear();
         waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
+
+        Bukkit.getScheduler().runTaskLater(DeathSwap.getInstance(), () -> {
+            init();
+            Bukkit.getServer().shutdown();
+        }, 100L);
     }
 
     public void sendWorldBoardPacket(Player player, World world) {
