@@ -6,15 +6,15 @@ import org.bukkit.entity.Player;
 /**
  * @author Blank038
  */
-public class GamePlayerKillEvent extends GamePlayerEvent {
+public class GamePlayerDeathEvent extends GamePlayerEvent {
     private final Player target;
 
-    public GamePlayerKillEvent(Player player, GameArena arena, Player target) {
+    public GamePlayerDeathEvent(Player player, GameArena arena, Player killer) {
         super(player, arena);
-        this.target = target;
+        this.target = killer;
     }
 
-    public Player getEntity() {
+    public Player getKiller() {
         return target;
     }
 }

@@ -49,7 +49,7 @@ public class PlayerScoreBoard {
             String text = list.get(i);
             team.setPrefix(text.length() > 16 ? text.substring(0, 16) : text);
             if (text.length() > 16) {
-                String color = text.startsWith(String.valueOf(ChatColor.COLOR_CHAR)) ? text.substring(0, 2) : "";
+                String color = text.startsWith(String.valueOf(ChatColor.COLOR_CHAR)) ? ChatColor.getLastColors(text) : "";
                 team.setSuffix(color + text.substring(16));
             }
         }

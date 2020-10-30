@@ -4,11 +4,14 @@ import com.blank038.deathswap.DeathSwap;
 import com.blank038.deathswap.enums.EditorType;
 import com.blank038.deathswap.enums.GameLocType;
 import com.blank038.deathswap.enums.GameStatus;
+import com.blank038.deathswap.event.*;
+import com.blank038.deathswap.game.data.BlockData;
 import com.blank038.deathswap.game.data.PlayerTempData;
 import com.blank038.deathswap.game.data.SwapData;
 import com.blank038.deathswap.game.data.WinnerData;
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder;
 import org.bukkit.*;
+import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,27 +31,34 @@ import java.util.*;
 public class GameArena {
     private final File file;
     private final HashMap<UUID, PlayerTempData> playerMap = new HashMap<>();
-    // 当前竞技场内玩家列表
+    /**
+     * 当前竞技场内玩家列表
+     */
     private final List<UUID> gamePlayers = new ArrayList<>(), allowTpList = new ArrayList<>();
-    private final String world;
+    private final String world, arenaKey;
     private int borderInterval, teleportInterval;
     private String arenaName;
     private int min, max, size;
     private GameStatus status = GameStatus.ERROR;
     private GameLocType gameLocType;
     private Location waitLoc, endLoc;
-    // 下方全为游戏临时数据
+    /**
+     * 下方全为游戏临时数据
+     */
     private int waitTime, tempSize, borderTime, swapTime;
     private BukkitTask startingTask, borderTask, tpTask;
     private WinnerData winnerData;
     private ScoreBoardManager scoreBoardManager;
     private SwapData swapData;
+    private BlockData blockData;
+    private boolean firstSwap;
 
 
     public GameArena(File file) {
         this.file = file;
-        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+        arenaKey = file.getName().replace(".yml", "");
 
+        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
         min = data.getInt("min");
         max = data.getInt("max");
         world = data.getString("world");
@@ -103,6 +113,11 @@ public class GameArena {
         } else {
             scoreBoardManager.clearScoreboard();
         }
+
+        if (blockData != null) {
+            blockData.reset();
+        }
+        blockData = new BlockData(Bukkit.getWorld(world));
     }
 
     /**
@@ -201,6 +216,10 @@ public class GameArena {
         return status;
     }
 
+    public BlockData getBlockData() {
+        return blockData;
+    }
+
     /**
      * 获取边界状态
      *
@@ -232,6 +251,12 @@ public class GameArena {
             player.sendMessage(DeathSwap.getLangData().getString("message.game-status.error", true));
             return false;
         }
+        // 唤起事件
+        GameJoinEvent event = new GameJoinEvent(player, this);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
         // 传送玩家
         Chunk chunk = waitLoc.getChunk();
         if (!chunk.isLoaded()) {
@@ -241,6 +266,10 @@ public class GameArena {
         player.teleport(waitLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
         // 创建玩家临时数据
         playerMap.put(player.getUniqueId(), new PlayerTempData(player));
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        player.setExp(0);
+        player.setLevel(0);
         player.sendMessage(DeathSwap.getLangData().getString("message.join", true)
                 .replace("%now%", String.valueOf(playerMap.size())).replace("%max%", String.valueOf(max)));
         scoreBoardManager.addPlayer(player);
@@ -256,13 +285,17 @@ public class GameArena {
     public boolean quit(Player player) {
         if (playerMap.containsKey(player.getUniqueId())) {
             // 恢复玩家背包
-            playerMap.get(player.getUniqueId()).restore();
             gamePlayers.remove(player.getUniqueId());
-            playerMap.remove(player.getUniqueId());
-            TeleportManager.teleportEndLocation(player, endLoc);
+            playerMap.remove(player.getUniqueId()).restore();
             scoreBoardManager.removePlayer(player);
             DeathSwap.getInstance().getGameManager().removePlayer(player.getUniqueId());
+            TeleportManager.teleportEndLocation(player, endLoc);
             checkStatus();
+
+            // 唤起事件
+            GameQuitEvent event = new GameQuitEvent(player, this);
+            Bukkit.getPluginManager().callEvent(event);
+
             return true;
         }
         return false;
@@ -284,20 +317,23 @@ public class GameArena {
                 killer.sendMessage(DeathSwap.getLangData().getString("message.kill-message.swap", true)
                         .replace("%player%", player.getName()));
                 sendAllPlayerText(DeathSwap.getLangData().getString("message.kill-message.swap-notify", true)
-                        .replace("%target%", player.getName()).replace("%player%", target));
-            }
-            if (killer != null && killer.isOnline() && gamePlayers.contains(killer.getUniqueId())
+                        .replace("%target%", target).replace("%player%", player.getName()));
+            } else if (killer != null && killer.isOnline() && gamePlayers.contains(killer.getUniqueId())
                     && playerMap.containsKey(killer.getUniqueId())) {
                 playerMap.get(killer.getUniqueId()).addKill();
                 killer.sendMessage(DeathSwap.getLangData().getString("message.kill-message.damage", true)
                         .replace("%player%", player.getName()));
                 sendAllPlayerText(DeathSwap.getLangData().getString("message.kill-message.damage-notify", true)
                         .replace("%target%", player.getName()).replace("%player%", killer.getName()));
-            }
-            if (killer != null && !swapData.hasPlayer(player.getName())) {
+            } else if (killer == null && !swapData.hasPlayer(player.getName())) {
                 sendAllPlayerText(DeathSwap.getLangData().getString("message.kill-message.die", true)
                         .replace("%player%", player.getName()));
             }
+
+            // 唤起事件
+            GamePlayerDeathEvent event = new GamePlayerDeathEvent(player, this, killer);
+            Bukkit.getPluginManager().callEvent(event);
+
             // 踢出玩家
             quit(player);
         }
@@ -308,7 +344,9 @@ public class GameArena {
      */
     public void onTeleport(Player player, PlayerTeleportEvent event) {
         if (allowTpList.contains(player.getUniqueId())) {
-            sendWorldBoardPacket(player, event.getTo().getWorld());
+            if (firstSwap) {
+                sendWorldBoardPacket(player, event.getTo().getWorld());
+            }
             allowTpList.remove(player.getUniqueId());
         } else {
             event.setCancelled(true);
@@ -375,15 +413,16 @@ public class GameArena {
             swapTime = teleportInterval;
             borderTime = borderInterval;
             swapData = new SwapData();
+            firstSwap = true;
             // 设置世界出生点及世界边界大小
             World w = Bukkit.getWorld(world);
             WorldBorder border = w.getWorldBorder();
-            border.setCenter(getInitLocation(w));
+            border.setCenter(getInitLocation(w, 0));
             border.setSize(tempSize);
             // 游戏房间
             for (Map.Entry<UUID, PlayerTempData> entry : playerMap.entrySet()) {
                 Player player = Bukkit.getPlayer(entry.getKey());
-                Location rc = randomLocation(size - 1);
+                Location rc = randomLocation((tempSize / 2));
                 allowTpList.add(player.getUniqueId());
                 gamePlayers.add(player.getUniqueId());
                 player.teleport(rc, PlayerTeleportEvent.TeleportCause.PLUGIN);
@@ -415,6 +454,7 @@ public class GameArena {
                 if (swapTime == 0) {
                     swapTime = teleportInterval;
                     swapData.reset();
+                    Collections.shuffle(gamePlayers);
                     for (int i = 1; i < gamePlayers.size(); i += 2) {
                         Player p1 = Bukkit.getPlayer(gamePlayers.get(i)), p2 = Bukkit.getPlayer(gamePlayers.get(i - 1));
                         swapData.add(p1.getName(), p2.getName());
@@ -428,6 +468,9 @@ public class GameArena {
                             p2.teleport(l1, PlayerTeleportEvent.TeleportCause.PLUGIN);
                         });
                     }
+                    if (teleportInterval > 10) {
+                        Bukkit.getScheduler().runTaskLater(DeathSwap.getInstance(), () -> swapData.reset(), 200L);
+                    }
                     return;
                 }
                 if (swapTime <= 10) {
@@ -436,6 +479,7 @@ public class GameArena {
                 }
                 swapTime--;
             }, 20L, 20L);
+            firstSwap = false;
         }
     }
 
@@ -448,11 +492,16 @@ public class GameArena {
         Player winner = Bukkit.getPlayer(uuid);
         winnerData = new WinnerData(winner.getName(), playerMap.get(uuid).getKillCount());
 
+        playerMap.remove(uuid).restore();
         allowTpList.add(uuid);
         DeathSwap.getInstance().getGameManager().removePlayer(uuid);
         winner.teleport(endLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(DeathSwap.getInstance(), this::init, 100L, 100L);
+        // 唤起事件
+        GameEndedEvent event = new GameEndedEvent(winner, this, false);
+        Bukkit.getPluginManager().callEvent(event);
+
+        Bukkit.getScheduler().runTaskLater(DeathSwap.getInstance(), this::init, 100L);
     }
 
     /**
@@ -460,6 +509,11 @@ public class GameArena {
      */
     public void forceEnd() {
         status = GameStatus.END;
+
+        // 唤起事件
+        GameEndedEvent event = new GameEndedEvent(null, this, true);
+        Bukkit.getPluginManager().callEvent(event);
+
         for (Map.Entry<UUID, PlayerTempData> entry : new HashSet<>(playerMap.entrySet())) {
             entry.getValue().restore();
             playerMap.remove(entry.getKey());
@@ -476,8 +530,6 @@ public class GameArena {
         worldBorder.world = ((CraftWorld) world).getHandle();
         worldBorder.setCenter(world.getSpawnLocation().getBlockX(), world.getSpawnLocation().getBlockZ());
         worldBorder.setSize(Bukkit.getWorld(this.world).getWorldBorder().getSize());
-        worldBorder.setWarningDistance(3);
-        worldBorder.setWarningTime(0);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutWorldBorder(worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE));
     }
 
@@ -551,24 +603,39 @@ public class GameArena {
         return section;
     }
 
-    private Location getInitLocation(World world) {
+    public HashMap<UUID, PlayerTempData> getAllPlayerData() {
+        return playerMap;
+    }
+
+    private Location getInitLocation(World world, int count) {
+        Location location;
         if (gameLocType == GameLocType.SPAWN_LOC) {
-            return world.getSpawnLocation();
+            location = world.getSpawnLocation();
         } else {
-            double rx = Math.random() * 10000, rz = Math.random() * 10000;
-            return new Location(world, rx, 100, rz);
+            double rx = Math.random() * 100000, rz = Math.random() * 100000;
+            location = new Location(world, rx, world.getHighestBlockYAt((int) rx, (int) rz), rz);
         }
+        Chunk chunk = location.getChunk();
+        if (!chunk.isLoaded()) {
+            chunk.load();
+        }
+        if (world.getBiome(location.getBlockX(), location.getBlockZ()) != Biome.OCEAN || count == 10) {
+            return location;
+        }
+        return getInitLocation(world, count + 1);
     }
 
     public Location randomLocation(int radius) {
         World world = Bukkit.getWorld(this.world);
         Location spawnLocation = world.getWorldBorder().getCenter().clone();
-        int minX = spawnLocation.getBlockX() - radius, maxX = spawnLocation.getBlockX() + radius;
-        int minZ = spawnLocation.getBlockZ() - radius, maxZ = spawnLocation.getBlockZ() + radius;
-        int mx = Math.max(maxX, minX), mix = Math.min(maxX, minX);
-        int mz = Math.max(maxZ, minZ), miz = Math.min(maxZ, minZ);
-        int randomX = (int) (mix + Math.random() * (mx - mix));
-        int randomZ = (int) (miz + Math.random() * (mz - miz));
-        return new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 1, randomZ);
+        int fr = -radius;
+        int randomX = (int) (fr + Math.random() * (radius - fr));
+        int randomZ = (int) (fr + Math.random() * (radius - fr));
+        int lastX = randomX + spawnLocation.getBlockX(), lastZ = randomZ + spawnLocation.getBlockZ();
+        return new Location(world, lastX, world.getHighestBlockYAt(lastX, lastZ) + 1, lastZ);
+    }
+
+    public String getArenaKey() {
+        return arenaKey;
     }
 }

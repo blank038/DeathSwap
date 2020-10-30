@@ -16,7 +16,9 @@ import java.util.UUID;
 public class GameManager {
     private final DeathSwap INSTANCE;
     private final HashMap<String, GameArena> arenaMap = new HashMap<>();
+    private final HashMap<String, GameArena> worldMap = new HashMap<>();
     private final HashMap<UUID, String> playerMap = new HashMap<>();
+    private GameArena bungeeArena;
 
     public GameManager() {
         INSTANCE = DeathSwap.getInstance();
@@ -32,13 +34,23 @@ public class GameManager {
             }
         }
         arenaMap.clear();
+        worldMap.clear();
         // 开始读取
         File path = new File(INSTANCE.getDataFolder(), "arenas");
         path.mkdir();
 
         for (File i : Objects.requireNonNull(path.listFiles())) {
             String name = i.getName().replace(".yml", "");
-            arenaMap.put(name, new GameArena(i));
+            GameArena arena = new GameArena(i);
+            arenaMap.put(name, arena);
+            if (arena.getGameWorld() != null) {
+                worldMap.put(arena.getGameWorld(), arena);
+            }
+        }
+
+        if (INSTANCE.getConfig().getBoolean("game-option.bungee") && !arenaMap.isEmpty()) {
+            String[] keys = arenaMap.keySet().toArray(new String[0]);
+            bungeeArena = arenaMap.get(keys[(int) (Math.random() * keys.length)]);
         }
     }
 
@@ -89,12 +101,24 @@ public class GameManager {
         return arenaMap.getOrDefault(arenaKey, null);
     }
 
+    public GameArena getArenaByWorld(String worldName) {
+        return worldMap.getOrDefault(worldName, null);
+    }
+
+    public GameArena getBungeeArena() {
+        return bungeeArena;
+    }
+
     public boolean hasArena(String key) {
         return arenaMap.containsKey(key);
     }
 
     public boolean hasPlayer(UUID uuid) {
         return playerMap.containsKey(uuid);
+    }
+
+    public boolean hasWorld(String worldName) {
+        return worldMap.containsKey(worldName);
     }
 
     public HashMap<String, GameArena> allGame() {

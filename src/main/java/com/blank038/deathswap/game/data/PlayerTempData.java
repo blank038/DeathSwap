@@ -80,6 +80,7 @@ public class PlayerTempData {
                     continue;
                 }
                 player.getInventory().setItem(entry.getKey(), entry.getValue());
+                System.out.println("11111");
             }
         }
     }

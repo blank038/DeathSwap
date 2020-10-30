@@ -6,14 +6,16 @@ import com.blank038.deathswap.configuration.LangData;
 import com.blank038.deathswap.game.GameArena;
 import com.blank038.deathswap.game.GameManager;
 import com.blank038.deathswap.game.ScoreBoardManager;
+import com.blank038.deathswap.listener.BlockListener;
 import com.blank038.deathswap.listener.PlayerListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Map;
 
 /**
- * An like UHC(Survival Game) minigame plugin.
+ * An similar to UHC(Survival Game) minigame plugin.
  * 一个类似于 UHC(生存游戏) 的小游戏插件.
  *
  * @author Blank038, Laotou
@@ -49,8 +51,6 @@ public class DeathSwap extends JavaPlugin {
         api = new DeathSwapApi();
         // 载入配置文件
         loadConfig();
-        // 注册事件监听器
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         // 注册命令执行器
         getCommand("deathswap").setExecutor(new MainCommand());
         //载入竞技场管理器
@@ -61,6 +61,9 @@ public class DeathSwap extends JavaPlugin {
                 entry.getValue().sendScoreBoardPacket();
             }
         }, 5L, 5L);
+        // 注册事件监听器
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
     }
 
     @Override
@@ -77,6 +80,7 @@ public class DeathSwap extends JavaPlugin {
      * 配置文件初始化和重载
      */
     public void loadConfig() {
+        getDataFolder().mkdir();
         saveDefaultConfig();
         reloadConfig();
         // 变量 loadData 初始化
@@ -85,6 +89,8 @@ public class DeathSwap extends JavaPlugin {
         } else {
             langData.init();
         }
+
+        new File(getDataFolder(), "data").mkdir();
 
         // 重载竞技场
         if (gameManager != null) {
