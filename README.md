@@ -4,7 +4,7 @@ An similar UHC minigame, every once in while random swap player location, player
 
 ## 特色(Features)
 * 每隔一段时间随机互换位置 (Radnom swap player location.)
-* 边界定时缩小 (WorldBorder narrow accord game time.)
+* 边界定时缩小 (WorldBorder narrow according game time.)
 * 胜利/战败/击杀执行命令 (Win/Fail/Kill Perform command.)
 * 支持 BungeeCord 模式 (Support BungeeCord mode.)
 * 高度自定义 (Highly customizable.)
