@@ -37,10 +37,20 @@ public class BlockData {
         }
         // 复原方块
         for (Block block : placedBlocks) {
-            world.getBlockAt(block.getLocation()).setType(Material.AIR);
+            if (block == null) {
+                continue;
+            }
+            Block b = world.getBlockAt(block.getLocation());
+            if (b == null) {
+                continue;
+            }
+            b.setType(Material.AIR);
         }
         for (Map.Entry<Block, Material> entry : blockMaterial.entrySet()) {
             Block at = world.getBlockAt(entry.getKey().getLocation());
+            if (at == null) {
+                continue;
+            }
             at.setType(entry.getValue());
             at.setData(blockData.get(entry.getKey()));
         }

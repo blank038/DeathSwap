@@ -56,7 +56,7 @@ public class DeathSwap extends JavaPlugin {
     public void onEnable() {
         inst = this;
 
-        if (initNMS()) {
+        if (!initNMS()) {
             return;
         }
 
@@ -76,14 +76,17 @@ public class DeathSwap extends JavaPlugin {
         // 注册事件监听器
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
+        Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
     }
 
     @Override
     public void onDisable() {
-        for (Map.Entry<String, GameArena> entry : gameManager.allGame().entrySet()) {
-            ScoreBoardManager sbm = entry.getValue().getScoreBoardManager();
-            if (sbm != null) {
-                sbm.clearScoreboard();
+        if (gameManager != null) {
+            for (Map.Entry<String, GameArena> entry : gameManager.allGame().entrySet()) {
+                ScoreBoardManager sbm = entry.getValue().getScoreBoardManager();
+                if (sbm != null) {
+                    sbm.clearScoreboard();
+                }
             }
         }
     }

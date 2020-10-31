@@ -10,7 +10,6 @@ import com.blank038.deathswap.game.data.PlayerTempData;
 import com.blank038.deathswap.game.data.SwapData;
 import com.blank038.deathswap.game.data.WinnerData;
 import org.bukkit.*;
-import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -27,6 +26,7 @@ import java.util.*;
  */
 public class GameArena {
     private final File file;
+    private final FileConfiguration data;
     private final HashMap<UUID, PlayerTempData> playerMap = new HashMap<>();
     /**
      * 当前竞技场内玩家列表
@@ -55,7 +55,7 @@ public class GameArena {
         this.file = file;
         arenaKey = file.getName().replace(".yml", "");
 
-        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+        data = YamlConfiguration.loadConfiguration(file);
         min = data.getInt("min");
         max = data.getInt("max");
         world = data.getString("world");
@@ -69,9 +69,9 @@ public class GameArena {
             gameLocType = GameLocType.valueOf(data.getString("loc-type"));
         }
 
-        loadLoc(data);
+        loadLoc();
 
-        if (waitLoc != null && endLoc != null && gameLocType != null && min >= 2 && size > 0) {
+        if (gameLocType != null && min >= 2 && size > 0) {
             init();
         }
     }
@@ -119,10 +119,11 @@ public class GameArena {
 
     /**
      * 载入坐标数据
-     *
-     * @param data 目标配置文件
      */
-    public void loadLoc(FileConfiguration data) {
+    public void loadLoc() {
+        if (endLoc != null && waitLoc != null) {
+            return;
+        }
         if (data.contains("end-pos")) {
             String endWorld = data.getString("end-pos.world");
             double x = data.getDouble("end-pos.x");
@@ -197,6 +198,10 @@ public class GameArena {
         return playerMap.containsKey(player.getUniqueId());
     }
 
+    public boolean errorLocation() {
+        return endLoc != null && waitLoc != null;
+    }
+
     public PlayerTempData getPlayerTempData(UUID uuid) {
         return playerMap.getOrDefault(uuid, null);
     }
@@ -244,7 +249,7 @@ public class GameArena {
             return false;
         }
         World world = Bukkit.getWorld(this.world);
-        if (world == null) {
+        if (world == null || !errorLocation()) {
             player.sendMessage(DeathSwap.getLangData().getString("message.game-status.error", true));
             return false;
         }
@@ -255,11 +260,11 @@ public class GameArena {
             return false;
         }
         // 传送玩家
+        allowTpList.add(player.getUniqueId());
         Chunk chunk = waitLoc.getChunk();
         if (!chunk.isLoaded()) {
             chunk.load();
         }
-        allowTpList.add(player.getUniqueId());
         player.teleport(waitLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
         // 创建玩家临时数据
         playerMap.put(player.getUniqueId(), new PlayerTempData(player));
@@ -543,12 +548,12 @@ public class GameArena {
     public void editorData(EditorType type, Object object) {
         switch (type) {
             case MIN:
-                min = (int) object;
-                setArenaConfig("min", object);
+                min = Integer.parseInt(String.valueOf(object));
+                setArenaConfig("min", min);
                 break;
             case MAX:
-                max = (int) object;
-                setArenaConfig("max", object);
+                max = Integer.parseInt(String.valueOf(object));
+                setArenaConfig("max", max);
                 break;
             case END:
                 endLoc = ((Location) object).clone();
@@ -620,7 +625,7 @@ public class GameArena {
         if (!chunk.isLoaded()) {
             chunk.load();
         }
-        if (world.getBiome(location.getBlockX(), location.getBlockZ()) != Biome.OCEAN || count == 10) {
+        if (!world.getBiome(location.getBlockX(), location.getBlockZ()).name().contains("OCEAN") || count == 10) {
             return location;
         }
         return getInitLocation(world, count + 1);
@@ -634,6 +639,10 @@ public class GameArena {
         int randomZ = (int) (fr + Math.random() * (radius - fr));
         int lastX = randomX + spawnLocation.getBlockX(), lastZ = randomZ + spawnLocation.getBlockZ();
         return new Location(world, lastX, world.getHighestBlockYAt(lastX, lastZ) + 1, lastZ);
+    }
+
+    public Location getEndLocation() {
+        return endLoc;
     }
 
     public String getArenaKey() {

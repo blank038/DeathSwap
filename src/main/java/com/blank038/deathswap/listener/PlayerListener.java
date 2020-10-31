@@ -19,6 +19,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -53,12 +54,11 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
-        if (INSTANCE.getConfig().getBoolean("game-option.bungee") && INSTANCE.getGameManager().getBungeeArena() != null) {
-            GameStatus status = INSTANCE.getGameManager().getBungeeArena().getGameStatus();
-            if (status == GameStatus.WAITING || status == GameStatus.STARTING) {
-                return;
+        if (INSTANCE.getConfig().getBoolean("game-option.bungee")) {
+            GameArena arena = INSTANCE.getGameManager().getBungeeArena();
+            if (arena == null || (arena.getGameStatus() != GameStatus.WAITING && arena.getGameStatus() != GameStatus.STARTING) || arena.errorLocation()) {
+                event.setKickMessage(GameStatus.ERROR.getStatusText());
             }
-            event.setKickMessage(status.getStatusText());
         }
     }
 
@@ -68,6 +68,10 @@ public class PlayerListener implements Listener {
 
         if (INSTANCE.getConfig().getBoolean("game-option.bungee") && INSTANCE.getGameManager().getBungeeArena() != null) {
             INSTANCE.getGameManager().submitJoin(event.getPlayer(), INSTANCE.getGameManager().getBungeeArena().getArenaKey());
+            // 判断是否加入成功
+            if (INSTANCE.getGameManager().hasPlayer(event.getPlayer().getUniqueId())) {
+                event.setJoinMessage(null);
+            }
         }
     }
 
@@ -75,7 +79,7 @@ public class PlayerListener implements Listener {
     public void onServerMotd(ServerListPingEvent event) {
         if (INSTANCE.getConfig().getBoolean("game-option.bungee")) {
             GameArena arena = INSTANCE.getGameManager().getBungeeArena();
-            GameStatus status = arena == null ? GameStatus.ERROR : arena.getGameStatus();
+            GameStatus status = (arena == null ? GameStatus.ERROR : arena.getGameStatus());
             event.setMotd(DeathSwap.getLangData().getString("message.motd." + status.name().toLowerCase(), false));
         }
     }
@@ -89,6 +93,9 @@ public class PlayerListener implements Listener {
         GameArena arena = INSTANCE.getGameManager().getPlayerGame(event.getPlayer().getUniqueId());
         if (arena != null) {
             arena.quit(event.getPlayer());
+        }
+        if (INSTANCE.getConfig().getBoolean("game-option.bungee") && INSTANCE.getGameManager().getBungeeArena() != null) {
+            event.setQuitMessage(null);
         }
     }
 
@@ -185,6 +192,23 @@ public class PlayerListener implements Listener {
         GameArena arena = INSTANCE.getGameManager().getArenaByWorld(event.getWorld().getName());
         if (arena != null && arena.getGameStatus() == GameStatus.STARTED) {
             arena.getBlockData().addChunk(event.getChunk());
+        }
+    }
+
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        if (INSTANCE.getGameManager().hasWorld(event.getWorld().getName())) {
+            INSTANCE.getGameManager().getArenaByWorld(event.getWorld().getName()).loadLoc();
+        }
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        if (INSTANCE.getGameManager().hasWorld(event.getPlayer().getWorld().getName())) {
+            GameArena arena = INSTANCE.getGameManager().getArenaByWorld(event.getPlayer().getWorld().getName());
+            if (arena != null) {
+                event.setRespawnLocation(INSTANCE.getGameManager().getArenaByWorld(event.getPlayer().getWorld().getName()).getEndLocation());
+            }
         }
     }
 }
