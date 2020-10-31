@@ -3,7 +3,7 @@
 An similar UHC minigame, every once in while random swap player location, player can build traps wait for the next swap player to here, world border will follow game time to narrow.
 
 ## 特色(Features)
-* 每隔一段时间随机互换位置 (Radnom swap player location.)
+* 每隔一段时间随机互换位置 (Random swap player location.)
 * 边界定时缩小 (WorldBorder narrow according game time.)
 * 胜利/战败/击杀执行命令 (Win/Fail/Kill Perform command.)
 * 支持 BungeeCord 模式 (Support BungeeCord mode.)
