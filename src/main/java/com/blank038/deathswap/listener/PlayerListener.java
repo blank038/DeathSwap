@@ -51,11 +51,21 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onLogin(PlayerLoginEvent event) {
+        if (INSTANCE.getConfig().getBoolean("game-option.bungee") && INSTANCE.getGameManager().getBungeeArena() != null) {
+            GameStatus status = INSTANCE.getGameManager().getBungeeArena().getGameStatus();
+            if (status == GameStatus.WAITING || status == GameStatus.STARTING) {
+                return;
+            }
+            event.setKickMessage(status.getStatusText());
+        }
+    }
+
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         PlayerInfoData.DATA_MAP.put(event.getPlayer().getName(), new PlayerInfoData(event.getPlayer()));
 
-        if (INSTANCE.getConfig().getBoolean("game-option.bungee")
-                && INSTANCE.getGameManager().getBungeeArena() != null) {
+        if (INSTANCE.getConfig().getBoolean("game-option.bungee") && INSTANCE.getGameManager().getBungeeArena() != null) {
             INSTANCE.getGameManager().submitJoin(event.getPlayer(), INSTANCE.getGameManager().getBungeeArena().getArenaKey());
         }
     }
