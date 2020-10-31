@@ -54,21 +54,19 @@ public class GameManager {
         }
     }
 
-    public boolean submitJoin(Player player, String arenaKey) {
+    public void submitJoin(Player player, String arenaKey) {
         if (arenaKey == null || !arenaMap.containsKey(arenaKey)) {
             player.sendMessage(DeathSwap.getLangData().getString("message.arena-not-exists", true));
-            return false;
+            return;
         }
         GameStatus status = arenaMap.get(arenaKey).getGameStatus();
         if (status == GameStatus.STARTED || status == GameStatus.END || status == GameStatus.ERROR) {
             player.sendMessage(DeathSwap.getLangData().getString("message.game-status." + status.name().toLowerCase(), true));
-            return false;
+            return;
         }
         if (arenaMap.get(arenaKey).join(player)) {
             playerMap.put(player.getUniqueId(), arenaKey);
-            return true;
         }
-        return false;
     }
 
     public void submitQuit(Player player) {
