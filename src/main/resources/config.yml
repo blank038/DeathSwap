@@ -1,11 +1,23 @@
-# 游戏模式设置
+# zh_CN: 游戏模式设置
+# en_US: DeathSwap game mode config.
 game-option:
   bungee: false
   lobby: "lobby"
 # 语言设置
 lang: zh_CN
-# 竞技场设置
+# zh_CN: 竞技场设置
+# en_US: The game arena option.
 arena-option:
   wait-time: 10
-# 时间格式
+# zh_CN: 时间格式
+# en_US: This is scoreboard date format.
 simple-date-format: "yyyy/MM/dd HH:mm:ss"
+# zh_CN: 事件奖励
+# en_US: Trigger game event to perform commands, or call it's event reward.
+event-reward:
+  win:
+    - "broadcast %player% win~"
+  lose:
+    - "broadcast %player% died."
+  kill:
+    - "broadcast %player% kill a player."

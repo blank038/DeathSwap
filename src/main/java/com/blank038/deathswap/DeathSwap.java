@@ -8,6 +8,8 @@ import com.blank038.deathswap.game.GameManager;
 import com.blank038.deathswap.game.ScoreBoardManager;
 import com.blank038.deathswap.listener.BlockListener;
 import com.blank038.deathswap.listener.PlayerListener;
+import com.blank038.deathswap.nms.NMSInterface;
+import com.blank038.deathswap.nms.v1_12_2;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +27,7 @@ public class DeathSwap extends JavaPlugin {
     private static LangData langData;
     private GameManager gameManager;
     private DeathSwapApi api;
+    private NMSInterface nms;
 
     public static DeathSwap getInstance() {
         return inst;
@@ -42,12 +45,21 @@ public class DeathSwap extends JavaPlugin {
         return api;
     }
 
+    public NMSInterface getNMSInterface() {
+        return nms;
+    }
+
     /**
      * 初始化插件
      */
     @Override
     public void onEnable() {
         inst = this;
+
+        if (initNMS()) {
+            return;
+        }
+
         api = new DeathSwapApi();
         // 载入配置文件
         loadConfig();
@@ -95,6 +107,25 @@ public class DeathSwap extends JavaPlugin {
         // 重载竞技场
         if (gameManager != null) {
             gameManager.loadGameArena();
+        }
+    }
+
+    private boolean initNMS() {
+        // 检查 nms
+        String version = "未知";
+        try {
+            version = Bukkit.getServer().getClass().getPackage().toString().replace(".", ",").split(",")[3];
+        } catch (Exception ignored) {
+        }
+        switch (version) {
+            case "v1_12_R1":
+                nms = new v1_12_2();
+                return true;
+            case "v1_16_R1":
+            default:
+                getLogger().warning("Not support this version: " + version);
+                setEnabled(false);
+                return false;
         }
     }
 }

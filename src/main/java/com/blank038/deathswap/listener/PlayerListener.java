@@ -2,6 +2,7 @@ package com.blank038.deathswap.listener;
 
 import com.blank038.deathswap.DeathSwap;
 import com.blank038.deathswap.enums.GameStatus;
+import com.blank038.deathswap.enums.PerformType;
 import com.blank038.deathswap.event.GameEndedEvent;
 import com.blank038.deathswap.event.GamePlayerDeathEvent;
 import com.blank038.deathswap.game.GameArena;
@@ -150,6 +151,8 @@ public class PlayerListener implements Listener {
             data.setGames(data.getGames() + 1);
             data.setWin(data.getWin() + 1);
             data.save();
+            // perform command.
+            PerformType.WIN.perform(event.getPlayer());
         }
     }
 
@@ -161,12 +164,16 @@ public class PlayerListener implements Listener {
             if (data != null) {
                 data.setKill(data.getKill() + 1);
             }
+            // perform command.
+            PerformType.KILL.perform(killer);
         }
         PlayerInfoData data = PlayerInfoData.DATA_MAP.getOrDefault(player.getName(), null);
         if (data != null) {
             data.setDeath(data.getDeath() + 1);
             data.setLose(data.getLose() + 1);
             data.setGames(data.getGames() + 1);
+            // perform command.
+            PerformType.LOSE.perform(killer);
         }
     }
 

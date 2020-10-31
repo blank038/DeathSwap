@@ -9,14 +9,11 @@ import com.blank038.deathswap.game.data.BlockData;
 import com.blank038.deathswap.game.data.PlayerTempData;
 import com.blank038.deathswap.game.data.SwapData;
 import com.blank038.deathswap.game.data.WinnerData;
-import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitTask;
@@ -534,11 +531,7 @@ public class GameArena {
     }
 
     public void sendWorldBoardPacket(Player player, World world) {
-        net.minecraft.server.v1_12_R1.WorldBorder worldBorder = new net.minecraft.server.v1_12_R1.WorldBorder();
-        worldBorder.world = ((CraftWorld) world).getHandle();
-        worldBorder.setCenter(world.getSpawnLocation().getBlockX(), world.getSpawnLocation().getBlockZ());
-        worldBorder.setSize(Bukkit.getWorld(this.world).getWorldBorder().getSize());
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutWorldBorder(worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE));
+        DeathSwap.getInstance().getNMSInterface().sendWorldBorder(player, world);
     }
 
     /**
