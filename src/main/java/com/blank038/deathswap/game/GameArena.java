@@ -447,7 +447,7 @@ public class GameArena {
                     // 计算缩圈
                     worldBorder.setWarningDistance(0);
                     worldBorder.setDamageAmount(1);
-                    worldBorder.setSize(tempSize, 60);
+                    worldBorder.setSize(tempSize, tempSize / 3);
                 }
                 borderTime--;
             }, 20L, 20L);
