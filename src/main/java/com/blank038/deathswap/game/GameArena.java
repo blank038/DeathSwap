@@ -23,16 +23,17 @@ import java.util.*;
 
 /**
  * @author Blank038
+ * @date 2020/10/27
  */
 public class GameArena {
-    private final File file;
-    private final FileConfiguration data;
-    private final HashMap<UUID, PlayerTempData> playerMap = new HashMap<>();
+    private final File SOURCE_FILE;
+    private final FileConfiguration FILE_DATA;
+    private final HashMap<UUID, PlayerTempData> PLAYER_MAP = new HashMap<>();
     /**
      * 当前竞技场内玩家列表
      */
-    private final List<UUID> gamePlayers = new ArrayList<>(), allowTpList = new ArrayList<>();
-    private final String world, arenaKey;
+    private final List<UUID> GAME_PLAYERS = new ArrayList<>(), ALLOW_TP_LIST = new ArrayList<>();
+    private final String WORLD_NAME, ARENA_KEY;
     private int borderInterval, teleportInterval;
     private String arenaName;
     private int min, max, size;
@@ -52,21 +53,22 @@ public class GameArena {
 
 
     public GameArena(File file) {
-        this.file = file;
-        arenaKey = file.getName().replace(".yml", "");
+        this.SOURCE_FILE = file;
+        ARENA_KEY = file.getName().replace(".yml", "");
 
-        data = YamlConfiguration.loadConfiguration(file);
-        min = data.getInt("min");
-        max = data.getInt("max");
-        world = data.getString("world");
-        size = data.getInt("size");
+        FILE_DATA = YamlConfiguration.loadConfiguration(file);
+        WORLD_NAME = FILE_DATA.getString("world");
+        min = FILE_DATA.getInt("min");
+        max = FILE_DATA.getInt("max");
+
+        size = FILE_DATA.getInt("size");
         arenaName = ChatColor.translateAlternateColorCodes('&',
-                data.getString("display-name"));
-        borderInterval = data.getInt("wb-interval");
-        teleportInterval = data.getInt("tp-interval");
+                FILE_DATA.getString("display-name"));
+        borderInterval = FILE_DATA.getInt("wb-interval");
+        teleportInterval = FILE_DATA.getInt("tp-interval");
 
-        if (data.contains("loc-type")) {
-            gameLocType = GameLocType.valueOf(data.getString("loc-type"));
+        if (FILE_DATA.contains("loc-type")) {
+            gameLocType = GameLocType.valueOf(FILE_DATA.getString("loc-type"));
         }
 
         loadLoc();
@@ -87,9 +89,9 @@ public class GameArena {
         swapTime = teleportInterval;
         borderTime = borderInterval;
 
-        gamePlayers.clear();
-        playerMap.clear();
-        allowTpList.clear();
+        GAME_PLAYERS.clear();
+        PLAYER_MAP.clear();
+        ALLOW_TP_LIST.clear();
 
         // 结束线程
         if (startingTask != null) {
@@ -114,7 +116,7 @@ public class GameArena {
         if (blockData != null) {
             blockData.reset();
         }
-        blockData = new BlockData(Bukkit.getWorld(world));
+        blockData = new BlockData(Bukkit.getWorld(WORLD_NAME));
     }
 
     /**
@@ -124,13 +126,13 @@ public class GameArena {
         if (endLoc != null && waitLoc != null) {
             return;
         }
-        if (data.contains("end-pos")) {
-            String endWorld = data.getString("end-pos.world");
-            double x = data.getDouble("end-pos.x");
-            double y = data.getDouble("end-pos.y");
-            double z = data.getDouble("end-pos.z");
-            float yaw = (float) data.getDouble("end-pos.yaw");
-            float pitch = (float) data.getDouble("end-pos.pitch");
+        if (FILE_DATA.contains("end-pos")) {
+            String endWorld = FILE_DATA.getString("end-pos.world");
+            double x = FILE_DATA.getDouble("end-pos.x");
+            double y = FILE_DATA.getDouble("end-pos.y");
+            double z = FILE_DATA.getDouble("end-pos.z");
+            float yaw = (float) FILE_DATA.getDouble("end-pos.yaw");
+            float pitch = (float) FILE_DATA.getDouble("end-pos.pitch");
             if (endWorld == null) {
                 return;
             }
@@ -140,13 +142,13 @@ public class GameArena {
             }
             endLoc = new Location(world, x, y, z, yaw, pitch);
         }
-        if (data.contains("wait-pos")) {
-            String startWorld = data.getString("wait-pos.world");
-            double x = data.getDouble("wait-pos.x");
-            double y = data.getDouble("wait-pos.y");
-            double z = data.getDouble("wait-pos.z");
-            float yaw = (float) data.getDouble("wait-pos.yaw");
-            float pitch = (float) data.getDouble("wait-pos.pitch");
+        if (FILE_DATA.contains("wait-pos")) {
+            String startWorld = FILE_DATA.getString("wait-pos.world");
+            double x = FILE_DATA.getDouble("wait-pos.x");
+            double y = FILE_DATA.getDouble("wait-pos.y");
+            double z = FILE_DATA.getDouble("wait-pos.z");
+            float yaw = (float) FILE_DATA.getDouble("wait-pos.yaw");
+            float pitch = (float) FILE_DATA.getDouble("wait-pos.pitch");
             if (startWorld == null) {
                 return;
             }
@@ -163,7 +165,7 @@ public class GameArena {
     }
 
     public String getGameWorld() {
-        return world;
+        return WORLD_NAME;
     }
 
     public int getMin() {
@@ -179,7 +181,7 @@ public class GameArena {
     }
 
     public int getPlayerCount() {
-        return playerMap.size();
+        return PLAYER_MAP.size();
     }
 
     public int getWaitTime() {
@@ -191,11 +193,11 @@ public class GameArena {
     }
 
     public int getLivingPlayerCount() {
-        return gamePlayers.size();
+        return GAME_PLAYERS.size();
     }
 
     public boolean hasPlayer(Player player) {
-        return playerMap.containsKey(player.getUniqueId());
+        return PLAYER_MAP.containsKey(player.getUniqueId());
     }
 
     public boolean errorLocation() {
@@ -203,7 +205,7 @@ public class GameArena {
     }
 
     public PlayerTempData getPlayerTempData(UUID uuid) {
-        return playerMap.getOrDefault(uuid, null);
+        return PLAYER_MAP.getOrDefault(uuid, null);
     }
 
     public WinnerData getWinnerData() {
@@ -228,7 +230,7 @@ public class GameArena {
      * @return 边界状态
      */
     public String getWorldBroadStatus() {
-        WorldBorder world = Bukkit.getWorld(this.world).getWorldBorder();
+        WorldBorder world = Bukkit.getWorld(this.WORLD_NAME).getWorldBorder();
         if (world.getSize() <= tempSize) {
             return DeathSwap.getLangData().getString("message.world-broad-status.wait", false).replace("%time%", String.valueOf(borderTime));
         } else {
@@ -240,15 +242,15 @@ public class GameArena {
      * 玩家加入当前竞技场
      */
     public boolean join(Player player) {
-        if (playerMap.containsKey(player.getUniqueId())) {
+        if (PLAYER_MAP.containsKey(player.getUniqueId())) {
             player.sendMessage(DeathSwap.getLangData().getString("message.in-arena", true));
             return false;
         }
-        if (playerMap.size() >= max) {
+        if (PLAYER_MAP.size() >= max) {
             player.sendMessage(DeathSwap.getLangData().getString("message.arena-full", true));
             return false;
         }
-        World world = Bukkit.getWorld(this.world);
+        World world = Bukkit.getWorld(this.WORLD_NAME);
         if (world == null || !errorLocation()) {
             player.sendMessage(DeathSwap.getLangData().getString("message.game-status.error", true));
             return false;
@@ -260,20 +262,20 @@ public class GameArena {
             return false;
         }
         // 传送玩家
-        allowTpList.add(player.getUniqueId());
+        ALLOW_TP_LIST.add(player.getUniqueId());
         Chunk chunk = waitLoc.getChunk();
         if (!chunk.isLoaded()) {
             chunk.load();
         }
         player.teleport(waitLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
         // 创建玩家临时数据
-        playerMap.put(player.getUniqueId(), new PlayerTempData(player));
+        PLAYER_MAP.put(player.getUniqueId(), new PlayerTempData(player));
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setExp(0);
         player.setLevel(0);
         player.sendMessage(DeathSwap.getLangData().getString("message.join", true)
-                .replace("%now%", String.valueOf(playerMap.size())).replace("%max%", String.valueOf(max)));
+                .replace("%now%", String.valueOf(PLAYER_MAP.size())).replace("%max%", String.valueOf(max)));
         scoreBoardManager.addPlayer(player);
         checkStatus();
         return true;
@@ -285,10 +287,10 @@ public class GameArena {
      * @param player 目标玩家
      */
     public boolean quit(Player player) {
-        if (playerMap.containsKey(player.getUniqueId())) {
+        if (PLAYER_MAP.containsKey(player.getUniqueId())) {
             // 恢复玩家背包
-            gamePlayers.remove(player.getUniqueId());
-            playerMap.remove(player.getUniqueId()).restore();
+            GAME_PLAYERS.remove(player.getUniqueId());
+            PLAYER_MAP.remove(player.getUniqueId()).restore();
             scoreBoardManager.removePlayer(player);
             DeathSwap.getInstance().getGameManager().removePlayer(player.getUniqueId());
             TeleportManager.teleportEndLocation(player, endLoc);
@@ -309,7 +311,7 @@ public class GameArena {
      * @param player 目标玩家
      */
     public void onDeath(Player player) {
-        if (gamePlayers.contains(player.getUniqueId())) {
+        if (GAME_PLAYERS.contains(player.getUniqueId())) {
             // 判断击杀者
             Player killer = player.getKiller();
             if (killer == null && swapData.hasPlayer(player.getName())) {
@@ -320,9 +322,9 @@ public class GameArena {
                         .replace("%player%", player.getName()));
                 sendAllPlayerText(DeathSwap.getLangData().getString("message.kill-message.swap-notify", true)
                         .replace("%target%", target).replace("%player%", player.getName()));
-            } else if (killer != null && killer.isOnline() && gamePlayers.contains(killer.getUniqueId())
-                    && playerMap.containsKey(killer.getUniqueId())) {
-                playerMap.get(killer.getUniqueId()).addKill();
+            } else if (killer != null && killer.isOnline() && GAME_PLAYERS.contains(killer.getUniqueId())
+                    && PLAYER_MAP.containsKey(killer.getUniqueId())) {
+                PLAYER_MAP.get(killer.getUniqueId()).addKill();
                 killer.sendMessage(DeathSwap.getLangData().getString("message.kill-message.damage", true)
                         .replace("%player%", player.getName()));
                 sendAllPlayerText(DeathSwap.getLangData().getString("message.kill-message.damage-notify", true)
@@ -345,11 +347,11 @@ public class GameArena {
      * 玩家传送事件
      */
     public void onTeleport(Player player, PlayerTeleportEvent event) {
-        if (allowTpList.contains(player.getUniqueId())) {
+        if (ALLOW_TP_LIST.contains(player.getUniqueId())) {
             if (firstSwap) {
                 sendWorldBoardPacket(player, event.getTo().getWorld());
             }
-            allowTpList.remove(player.getUniqueId());
+            ALLOW_TP_LIST.remove(player.getUniqueId());
         } else {
             event.setCancelled(true);
         }
@@ -360,15 +362,15 @@ public class GameArena {
      */
     public void checkStatus() {
         if (status == GameStatus.STARTING) {
-            if (playerMap.size() < min) {
+            if (PLAYER_MAP.size() < min) {
                 waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
                 startingTask.cancel();
                 status = GameStatus.WAITING;
                 scoreBoardManager.refresh();
             }
-        } else if (status == GameStatus.STARTED && gamePlayers.size() == 1) {
-            normalEnd(gamePlayers.get(0));
-        } else if (status == GameStatus.WAITING && playerMap.size() >= min) {
+        } else if (status == GameStatus.STARTED && GAME_PLAYERS.size() == 1) {
+            normalEnd(GAME_PLAYERS.get(0));
+        } else if (status == GameStatus.WAITING && PLAYER_MAP.size() >= min) {
             status = GameStatus.STARTING;
             scoreBoardManager.refresh();
             waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
@@ -397,7 +399,7 @@ public class GameArena {
      * 给房间内全体玩家发送文本
      */
     public void sendAllPlayerText(String text) {
-        for (Map.Entry<UUID, PlayerTempData> entry : playerMap.entrySet()) {
+        for (Map.Entry<UUID, PlayerTempData> entry : PLAYER_MAP.entrySet()) {
             Player player = Bukkit.getPlayer(entry.getKey());
             player.sendMessage(text);
         }
@@ -417,16 +419,16 @@ public class GameArena {
             swapData = new SwapData();
             firstSwap = true;
             // 设置世界出生点及世界边界大小
-            World w = Bukkit.getWorld(world);
+            World w = Bukkit.getWorld(WORLD_NAME);
             WorldBorder border = w.getWorldBorder();
             border.setCenter(getInitLocation(w, 0));
             border.setSize(tempSize);
             // 游戏房间
-            for (Map.Entry<UUID, PlayerTempData> entry : playerMap.entrySet()) {
+            for (Map.Entry<UUID, PlayerTempData> entry : PLAYER_MAP.entrySet()) {
                 Player player = Bukkit.getPlayer(entry.getKey());
                 Location rc = randomLocation((tempSize / 2));
-                allowTpList.add(player.getUniqueId());
-                gamePlayers.add(player.getUniqueId());
+                ALLOW_TP_LIST.add(player.getUniqueId());
+                GAME_PLAYERS.add(player.getUniqueId());
                 player.teleport(rc, PlayerTeleportEvent.TeleportCause.PLUGIN);
                 Bukkit.getScheduler().runTaskLater(DeathSwap.getInstance(), () -> sendWorldBoardPacket(player, rc.getWorld()), 20L);
             }
@@ -435,7 +437,7 @@ public class GameArena {
                 if (tempSize <= 5) {
                     return;
                 }
-                World world = Bukkit.getWorld(this.world);
+                World world = Bukkit.getWorld(this.WORLD_NAME);
                 WorldBorder worldBorder = world.getWorldBorder();
                 if (worldBorder.getSize() > tempSize) {
                     return;
@@ -456,13 +458,13 @@ public class GameArena {
                 if (swapTime == 0) {
                     swapTime = teleportInterval;
                     swapData.reset();
-                    Collections.shuffle(gamePlayers);
-                    for (int i = 1; i < gamePlayers.size(); i += 2) {
-                        Player p1 = Bukkit.getPlayer(gamePlayers.get(i)), p2 = Bukkit.getPlayer(gamePlayers.get(i - 1));
+                    Collections.shuffle(GAME_PLAYERS);
+                    for (int i = 1; i < GAME_PLAYERS.size(); i += 2) {
+                        Player p1 = Bukkit.getPlayer(GAME_PLAYERS.get(i)), p2 = Bukkit.getPlayer(GAME_PLAYERS.get(i - 1));
                         swapData.add(p1.getName(), p2.getName());
                         swapData.add(p2.getName(), p1.getName());
-                        allowTpList.add(p1.getUniqueId());
-                        allowTpList.add(p2.getUniqueId());
+                        ALLOW_TP_LIST.add(p1.getUniqueId());
+                        ALLOW_TP_LIST.add(p2.getUniqueId());
                         // 开始传送
                         Bukkit.getScheduler().runTask(DeathSwap.getInstance(), () -> {
                             Location l1 = p1.getLocation().clone(), l2 = p2.getLocation().clone();
@@ -492,10 +494,10 @@ public class GameArena {
         status = GameStatus.END;
 
         Player winner = Bukkit.getPlayer(uuid);
-        winnerData = new WinnerData(winner.getName(), playerMap.get(uuid).getKillCount());
+        winnerData = new WinnerData(winner.getName(), PLAYER_MAP.get(uuid).getKillCount());
 
-        playerMap.remove(uuid).restore();
-        allowTpList.add(uuid);
+        PLAYER_MAP.remove(uuid).restore();
+        ALLOW_TP_LIST.add(uuid);
         DeathSwap.getInstance().getGameManager().removePlayer(uuid);
         winner.teleport(endLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
@@ -519,14 +521,14 @@ public class GameArena {
         GameEndedEvent event = new GameEndedEvent(null, this, true);
         Bukkit.getPluginManager().callEvent(event);
 
-        for (Map.Entry<UUID, PlayerTempData> entry : new HashSet<>(playerMap.entrySet())) {
+        for (Map.Entry<UUID, PlayerTempData> entry : new HashSet<>(PLAYER_MAP.entrySet())) {
             entry.getValue().restore();
-            playerMap.remove(entry.getKey());
+            PLAYER_MAP.remove(entry.getKey());
             Player player = Bukkit.getPlayer(entry.getKey());
             TeleportManager.teleportEndLocation(player, endLoc);
         }
-        gamePlayers.clear();
-        playerMap.clear();
+        GAME_PLAYERS.clear();
+        PLAYER_MAP.clear();
         waitTime = DeathSwap.getInstance().getConfig().getInt("arena-option.wait-time");
 
         Bukkit.getScheduler().runTaskLater(DeathSwap.getInstance(), () -> {
@@ -589,10 +591,10 @@ public class GameArena {
     }
 
     public void setArenaConfig(String key, Object obj) {
-        FileConfiguration data = YamlConfiguration.loadConfiguration(file);
+        FileConfiguration data = YamlConfiguration.loadConfiguration(SOURCE_FILE);
         data.set(key, obj);
         try {
-            data.save(file);
+            data.save(SOURCE_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -610,7 +612,7 @@ public class GameArena {
     }
 
     public HashMap<UUID, PlayerTempData> getAllPlayerData() {
-        return playerMap;
+        return PLAYER_MAP;
     }
 
     private Location getInitLocation(World world, int count) {
@@ -632,7 +634,7 @@ public class GameArena {
     }
 
     public Location randomLocation(int radius) {
-        World world = Bukkit.getWorld(this.world);
+        World world = Bukkit.getWorld(this.WORLD_NAME);
         Location spawnLocation = world.getWorldBorder().getCenter().clone();
         int fr = -radius;
         int randomX = (int) (fr + Math.random() * (radius - fr));
@@ -645,7 +647,7 @@ public class GameArena {
         return endLoc;
     }
 
-    public String getArenaKey() {
-        return arenaKey;
+    public String getARENA_KEY() {
+        return ARENA_KEY;
     }
 }

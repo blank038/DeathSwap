@@ -9,7 +9,6 @@ import com.blank038.deathswap.game.GameArena;
 import com.blank038.deathswap.game.data.PlayerInfoData;
 import com.blank038.deathswap.game.data.PlayerTempData;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -67,7 +66,7 @@ public class PlayerListener implements Listener {
         PlayerInfoData.DATA_MAP.put(event.getPlayer().getName(), new PlayerInfoData(event.getPlayer()));
 
         if (INSTANCE.getConfig().getBoolean("game-option.bungee") && INSTANCE.getGameManager().getBungeeArena() != null) {
-            INSTANCE.getGameManager().submitJoin(event.getPlayer(), INSTANCE.getGameManager().getBungeeArena().getArenaKey());
+            INSTANCE.getGameManager().submitJoin(event.getPlayer(), INSTANCE.getGameManager().getBungeeArena().getARENA_KEY());
             // 判断是否加入成功
             if (INSTANCE.getGameManager().hasPlayer(event.getPlayer().getUniqueId())) {
                 event.setJoinMessage(null);
@@ -105,6 +104,7 @@ public class PlayerListener implements Listener {
         if (arena != null) {
             event.setDeathMessage(null);
             arena.onDeath(event.getEntity());
+            event.getEntity().spigot().respawn();
         }
     }
 
